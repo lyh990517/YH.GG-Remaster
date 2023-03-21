@@ -7,5 +7,5 @@ import yunho.compose.yhgg_remaster.data.entity.SummonerDTO
 interface SummonerRepository {
     suspend fun getSummonerInfo(summonerName: String): Flow<SummonerDTO>
 
-    suspend fun getSummonerLeagueEntry(id: String): Flow<LeagueEntryDTO>
+    suspend fun getSummonerLeagueEntry(id: String): Flow<List<LeagueEntryDTO>>
 }

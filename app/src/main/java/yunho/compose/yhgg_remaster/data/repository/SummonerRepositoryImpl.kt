@@ -1,5 +1,6 @@
 package yunho.compose.yhgg_remaster.data.repository
 
+import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import yunho.compose.yhgg_remaster.data.api.SummonerService
@@ -16,7 +17,7 @@ class SummonerRepositoryImpl @Inject constructor(private val summonerApi: Summon
         }
     }
 
-    override suspend fun getSummonerLeagueEntry(id: String): Flow<LeagueEntryDTO> = flow {
+    override suspend fun getSummonerLeagueEntry(id: String): Flow<List<LeagueEntryDTO>> = flow {
         val response = summonerApi.getSummonerEntriesByEncryptedSummonerID(id)
         response.body()?.let {
             emit(it)

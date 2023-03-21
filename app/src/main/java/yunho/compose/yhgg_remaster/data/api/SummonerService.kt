@@ -21,6 +21,6 @@ interface SummonerService {
     suspend fun getSummonerEntriesByEncryptedSummonerID(
         @Path("encryptedSummonerId") encryptedSummonerId : String,
         @Query("api_key") APIKey : String = API_KEY
-    ): Response<LeagueEntryDTO>
+    ): Response<List<LeagueEntryDTO>>
 
 }
