@@ -16,7 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import yunho.compose.yhgg_remaster.presentaion.SummonerState
+import yunho.compose.yhgg_remaster.presentaion.state.SummonerState
 import yunho.compose.yhgg_remaster.presentaion.viewmodel.MainViewModel
 import yunho.compose.yhgg_remaster.ui.theme.YHGGRemasterTheme
 
@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleSuccess(it: SummonerState.Success) {
-        Log.e("state", "success: ${it.infoData.name}")
+        Log.e("state", "success: ${it.infoData}")
     }
 }
 

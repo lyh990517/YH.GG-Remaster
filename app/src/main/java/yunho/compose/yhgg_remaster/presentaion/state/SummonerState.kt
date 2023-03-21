@@ -1,4 +1,4 @@
-package yunho.compose.yhgg_remaster.presentaion
+package yunho.compose.yhgg_remaster.presentaion.state
 
 import yunho.compose.yhgg_remaster.data.entity.SummonerDTO
 
