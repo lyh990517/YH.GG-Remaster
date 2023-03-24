@@ -15,11 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import yunho.compose.yhgg_remaster.presentaion.state.MatchState
-import yunho.compose.yhgg_remaster.presentaion.state.SummonerState
-import yunho.compose.yhgg_remaster.presentaion.viewmodel.MatchViewModel
 import yunho.compose.yhgg_remaster.presentaion.viewmodel.SummonerViewModel
 import yunho.compose.yhgg_remaster.ui.theme.YHGGRemasterTheme
 
