@@ -55,15 +55,20 @@ internal class SummonerViewModelTest {
 
     @Test
     fun getSummonerState() = runBlocking {
+        val leagueEntryDTO = listOf(mockk<LeagueEntryDTO>())
+        val summonerDTO = mockk<SummonerDTO>()
+        viewModel.summonerState.value = SummonerState.Loading
+        viewModel.summonerState.value = SummonerState.Success(summonerDTO)
+        viewModel.summonerState.value = SummonerState.LoadLeagueEntry(leagueEntryDTO)
         val job = launch {
             viewModel.summonerState.collect {
                 when (it) {
                     is SummonerState.UnInitialized -> assertEquals(SummonerState.UnInitialized, it)
                     is SummonerState.Loading -> assertEquals(SummonerState.Loading, it)
-                    is SummonerState.Success -> assertEquals(SummonerState.Success(mockk()), it)
+                    is SummonerState.Success -> assertEquals(SummonerState.Success(summonerDTO), it)
                     is SummonerState.LoadLeagueEntry -> assertEquals(
                         SummonerState.LoadLeagueEntry(
-                            mockk()
+                            leagueEntryDTO
                         ), it
                     )
                     else -> {}
