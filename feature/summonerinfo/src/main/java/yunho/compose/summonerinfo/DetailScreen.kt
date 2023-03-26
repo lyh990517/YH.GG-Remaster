@@ -2,11 +2,10 @@ package yunho.compose.summonerinfo
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
@@ -30,6 +29,7 @@ fun DetailScreen(
     }
     val summonerState = summonerViewModel.summonerState.collectAsState()
     val matchState = matchViewModel.matchState.collectAsState()
+    val itemList = remember{ mutableListOf<MatchState.Success>() }
     Column {
         Text(text = "${summonerState.value}")
         when (summonerState.value) {
@@ -44,7 +44,12 @@ fun DetailScreen(
         when (matchState.value) {
             is MatchState.Success -> {
                 val match = matchState.value as MatchState.Success
-                Text(text = match.toString())
+                itemList.add(match)
+                LazyColumn(){
+                    items(itemList){
+                        Text(text = "${it.matchData.info.gameId}")
+                    }
+                }
             }
             is MatchState.LoadIds -> {
                 val ids = matchState.value as MatchState.LoadIds
