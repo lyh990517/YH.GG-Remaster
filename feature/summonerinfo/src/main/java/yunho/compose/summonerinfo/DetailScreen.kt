@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
@@ -29,7 +30,7 @@ fun DetailScreen(
     }
     val summonerState = summonerViewModel.summonerState.collectAsState()
     val matchState = matchViewModel.matchState.collectAsState()
-    val itemList = remember{ mutableListOf<MatchState.Success>() }
+    val itemList = rememberSaveable{ mutableListOf<MatchState.Success>() }
     Column {
         Text(text = "${summonerState.value}")
         when (summonerState.value) {
@@ -47,7 +48,7 @@ fun DetailScreen(
                 itemList.add(match)
                 LazyColumn(){
                     items(itemList){
-                        Text(text = "${it.matchData.info.gameId}")
+                        Text(text = "${it.matchData.info.participants}")
                     }
                 }
             }
