@@ -1,5 +1,6 @@
 package yunho.compose.yhgg_remaster.presentaion.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +24,7 @@ class SummonerViewModel @Inject constructor(
         getOneSummonerInfoUseCase.getInfo(summonerName).catch {
             _summonerState.value = SummonerState.Error(it)
         }.collect {
+            Log.e("123","${it}")
             _summonerState.value = SummonerState.Success(it)
         }
     }

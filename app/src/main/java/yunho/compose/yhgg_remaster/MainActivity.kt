@@ -19,12 +19,8 @@ import yunho.compose.yhgg_remaster.ui.theme.YHGGRemasterTheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val viewmodel:SummonerViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        lifecycleScope.launch {
-            viewmodel.getSummonerInfo("hide on bush")
-        }
         setContent {
             YHGGRemasterTheme {
                 // A surface container using the 'background' color from the theme
@@ -32,7 +28,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    SearchScreen()
+                    YH_GG_App()
                 }
             }
         }
