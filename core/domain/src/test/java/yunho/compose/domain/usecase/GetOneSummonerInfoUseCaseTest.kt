@@ -17,19 +17,21 @@ class GetOneSummonerInfoUseCaseTest {
 
     @MockK
     private lateinit var summonerRepository: SummonerRepository
+    private lateinit var getOneSummonerInfoUseCase: GetOneSummonerInfoUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
+        getOneSummonerInfoUseCase = GetOneSummonerInfoUseCase(summonerRepository)
     }
 
     @Test
-    fun getInfo() = runBlocking {
+    fun `getInfo should emit SummonerDTO`() = runBlocking {
         val summonerName = "lyh123"
         val summonerDTO = mockk<SummonerDTO>()
 
         coEvery { summonerRepository.getSummonerInfo(summonerName) } returns flow { emit(summonerDTO) }
-        val result = GetOneSummonerInfoUseCase(summonerRepository).getInfo(summonerName).toList().first()
+        val result = getOneSummonerInfoUseCase.getInfo(summonerName).toList().first()
 
         assertEquals(summonerDTO, result)
     }

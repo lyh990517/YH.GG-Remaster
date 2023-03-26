@@ -17,14 +17,16 @@ internal class GetOneSummonerLeagueEntryUseCaseTest {
 
     @MockK
     private lateinit var summonerRepository: SummonerRepository
+    private lateinit var getOneSummonerLeagueEntryUseCase: GetOneSummonerLeagueEntryUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
+        getOneSummonerLeagueEntryUseCase = GetOneSummonerLeagueEntryUseCase(summonerRepository)
     }
 
     @Test
-    fun getLeagueEntry() = runBlocking {
+    fun `getLeagueEntry should emit LeagueEntryDTO`() = runBlocking {
         val id = "1"
         val leagueEntryDTO = listOf(mockk<LeagueEntryDTO>())
 
@@ -33,9 +35,7 @@ internal class GetOneSummonerLeagueEntryUseCaseTest {
                 leagueEntryDTO
             )
         }
-
-        val result =
-            GetOneSummonerLeagueEntryUseCase(summonerRepository).getLeagueEntry(id).toList().first()
+        val result = getOneSummonerLeagueEntryUseCase.getLeagueEntry(id).toList().first()
         assertEquals(leagueEntryDTO, result)
     }
 }

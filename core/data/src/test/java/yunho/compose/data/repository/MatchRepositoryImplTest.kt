@@ -21,6 +21,7 @@ internal class MatchRepositoryImplTest {
 
     @MockK
     private lateinit var matchDataSource: MatchDataSource
+
     private lateinit var matchRepositoryImpl: MatchRepositoryImpl
 
     @Before
@@ -30,7 +31,7 @@ internal class MatchRepositoryImplTest {
     }
 
     @Test
-    fun getMatchId() = runBlocking {
+    fun `getMatchId should emit listOf string`() = runBlocking {
         val puuid = "123"
         val idListOfMatch = listOf("matchId1", "matchId1", "matchId3")
 
@@ -42,7 +43,7 @@ internal class MatchRepositoryImplTest {
     }
 
     @Test
-    fun getMatchInfo() = runBlocking {
+    fun `getMatchInfo should emit matchDTO`() = runBlocking {
         val matchId = "matchId"
         val metadata = mockk<MetadataDTO>()
         val info = mockk<InfoDTO>()

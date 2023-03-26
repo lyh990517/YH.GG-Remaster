@@ -21,14 +21,16 @@ internal class GetOneMatchInfoUseCaseTest {
 
     @MockK
     private lateinit var matchRepository: MatchRepository
+    private lateinit var getOneMatchInfoUseCase: GetOneMatchInfoUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
+        getOneMatchInfoUseCase = GetOneMatchInfoUseCase(matchRepository)
     }
 
     @Test
-    fun getInfo() = runBlocking {
+    fun `getInfo should emit MatchDTO`() = runBlocking {
         val matchId = "1"
         val matchDTO = mockk<MatchDTO>()
         val infoDTO = mockk<InfoDTO>()
@@ -38,7 +40,7 @@ internal class GetOneMatchInfoUseCaseTest {
 
         coEvery { matchRepository.getMatchInfo(matchId) } returns flow { emit(matchDTO) }
 
-        val result = GetOneMatchInfoUseCase(matchRepository).getInfo(matchId).toList().first()
+        val result = getOneMatchInfoUseCase.getInfo(matchId).toList().first()
 
         assertEquals(matchDTO, result)
     }

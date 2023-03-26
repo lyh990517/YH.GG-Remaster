@@ -15,21 +15,22 @@ internal class GetMatchIdsUseCaseTest {
 
     @MockK
     private lateinit var matchRepository: MatchRepository
-
+    private lateinit var getMatchIdsUseCase: GetMatchIdsUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
+        getMatchIdsUseCase = GetMatchIdsUseCase(matchRepository)
     }
 
     @Test
-    fun getMatchIds() = runBlocking {
+    fun `getMatchIds should emit listOf string`() = runBlocking {
         val puuid = "1"
         val matchIds = listOf("1", "2", "3")
 
         coEvery { matchRepository.getMatchId(puuid) } returns flow { emit(matchIds) }
 
-        val result = GetMatchIdsUseCase(matchRepository).getMatchIds(puuid).toList().first()
+        val result = getMatchIdsUseCase.getMatchIds(puuid).toList().first()
 
         assertEquals(matchIds,result)
     }

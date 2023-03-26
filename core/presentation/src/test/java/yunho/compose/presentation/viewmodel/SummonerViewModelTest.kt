@@ -1,21 +1,15 @@
 package yunho.compose.presentation.viewmodel
 
-import android.util.Log
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.fail
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import yunho.compose.domain.model.LeagueEntryDTO
 import yunho.compose.domain.model.SummonerDTO
@@ -35,16 +29,14 @@ internal class SummonerViewModelTest {
     @MockK
     private lateinit var getOneSummonerLeagueEntryUseCase: GetOneSummonerLeagueEntryUseCase
 
-    @MockK
     private lateinit var viewModel: SummonerViewModel
 
-    private val state = MutableStateFlow<SummonerState>(SummonerState.UnInitialized)
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
         Dispatchers.setMain(dispatcher)
-        every { viewModel.summonerState } returns state
+        viewModel = SummonerViewModel(getOneSummonerInfoUseCase, getOneSummonerLeagueEntryUseCase)
     }
 
     @After
@@ -54,7 +46,7 @@ internal class SummonerViewModelTest {
     }
 
     @Test
-    fun getSummonerState() = runBlocking {
+    fun `getSummonerState should collect SummonerState`() = runBlocking {
         val leagueEntryDTO = listOf(mockk<LeagueEntryDTO>())
         val summonerDTO = mockk<SummonerDTO>()
         viewModel.summonerState.value = SummonerState.Loading
@@ -80,44 +72,33 @@ internal class SummonerViewModelTest {
     }
 
     @Test
-    fun getSummonerInfo() = runBlocking {
+    fun `getSummonerInfo should collect Success of SummonerState`() = runBlocking {
         // Arrange
         val summonerDTO = mockk<SummonerDTO>()
-        every { summonerDTO.name } returns "test"
+        every { summonerDTO.name } returns "lyh123"
         val name = summonerDTO.name
         coEvery { getOneSummonerInfoUseCase.getInfo(name) } returns flow { emit(summonerDTO) }
-        coEvery { viewModel.getSummonerInfo(name) } returns launch {
-            getOneSummonerInfoUseCase.getInfo(name).collect {
-                viewModel.summonerState.value = SummonerState.Success(it)
-            }
-        }
-        assertEquals(SummonerState.UnInitialized, viewModel.summonerState.value)
-        viewModel.summonerState.value = SummonerState.Loading
+
         assertEquals(SummonerState.Loading, viewModel.summonerState.value)
-        viewModel.getSummonerInfo(name).join()
-        assertEquals(SummonerState.Success(summonerDTO).infoData, summonerDTO)
+        val job = viewModel.getSummonerInfo(name)
+        delay(10)
+        job.cancel()
+        assertEquals(SummonerState.Success(summonerDTO), viewModel.summonerState.value)
     }
 
     @Test
-    fun getSummonerLeague() = runBlocking {
+    fun `getSummonerLeague should collect Success of SummonerState`() = runBlocking {
         val leagueEntryDTO = mockk<LeagueEntryDTO>()
         val response = listOf(leagueEntryDTO)
         every { leagueEntryDTO.summonerId } returns "test"
         val id = leagueEntryDTO.summonerId
         coEvery { getOneSummonerLeagueEntryUseCase.getLeagueEntry(id) } returns flow { emit(response) }
-        coEvery { viewModel.getSummonerLeague(id) } returns launch {
-            getOneSummonerLeagueEntryUseCase.getLeagueEntry(id).collect {
-                viewModel.summonerState.value = SummonerState.LoadLeagueEntry(it)
-            }
-        }
-        assertEquals(SummonerState.UnInitialized, viewModel.summonerState.value)
-        viewModel.summonerState.value = SummonerState.Loading
+
         assertEquals(SummonerState.Loading, viewModel.summonerState.value)
-        viewModel.getSummonerLeague(id).join()
-        assertEquals(
-            SummonerState.LoadLeagueEntry(listOf(leagueEntryDTO)),
-            viewModel.summonerState.value
-        )
+        val job = viewModel.getSummonerLeague(leagueEntryDTO.summonerId)
+        delay(100)
+        job.cancel()
+        assertEquals(SummonerState.LoadLeagueEntry(response), viewModel.summonerState.value)
 
     }
 

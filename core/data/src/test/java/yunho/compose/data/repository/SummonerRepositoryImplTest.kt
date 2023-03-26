@@ -44,7 +44,7 @@ internal class SummonerRepositoryImplTest {
     }
 
     @Test
-    fun getSummonerLeagueEntry() = runBlocking {
+    fun `getSummonerLeagueEntry should emit LeagueEntryDTO`() = runBlocking {
         val id = "summonerId"
         val given =
             LeagueEntryDTO(
