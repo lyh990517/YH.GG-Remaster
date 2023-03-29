@@ -19,6 +19,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import yunho.compose.domain.model.LeagueEntryDTO
 import yunho.compose.domain.model.MatchDTO
@@ -107,32 +108,27 @@ fun DetailScreen(
 
 @Composable
 fun SummonerView(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     leagueEntryDTO: List<LeagueEntryDTO>,
     summonerDTO: SummonerDTO
 ) {
-    Box(modifier = modifier) {
+    Box(modifier = modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(id = R.drawable.teemo),
+            painter = painterResource(id = R.drawable.ic_launcher_background),
             contentDescription = "",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.FillWidth
+            contentScale = ContentScale.Crop,
+            modifier = modifier.fillMaxSize()
         )
-        Column(modifier, verticalArrangement = Arrangement.Bottom) {
-            Row() {
+        Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
+            Row(modifier = Modifier) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_background),
-                    contentDescription = ""
+                    painter = painterResource(id = R.drawable.teemo),
+                    contentDescription = "",
+                    Modifier
+                        .width(100.dp)
+                        .height(100.dp)
                 )
-                Text(text = "test")
-            }
-            Row() {
-                Button(onClick = {}) {
-
-                }
-                Button(onClick = {}) {
-
-                }
+                Text(text = "name", fontSize = 30.sp)
             }
         }
     }
@@ -176,7 +172,7 @@ fun TopImageViewPreview() {
 @Preview
 @Composable
 fun SummonerViewPreview() {
-    SummonerView(leagueEntryDTO = dummy, summonerDTO = dummySummonerDTO)
+    SummonerView(leagueEntryDTO = dummy, summonerDTO = dummySummonerDTO, modifier = Modifier)
 }
 
 @Preview
