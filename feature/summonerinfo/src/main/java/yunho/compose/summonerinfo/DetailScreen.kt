@@ -133,7 +133,7 @@ fun TopScrollContent(
         modifier = modifier
     ) {
         Image(
-            painter = painterResource(id = R.drawable.background),
+            painter = painterResource(id = R.drawable.background2),
             contentDescription = "backGround",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -194,18 +194,18 @@ fun SummonerView(
                 ).value
             )
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.background2),
-            contentDescription = "",
-            modifier
-                .heightIn(
-                    max = animateDpAsState(
-                        targetValue = dynamicHeight.dp
-                    ).value
-                )
-                .fillMaxWidth(),
-            contentScale = ContentScale.Crop
-        )
+//        Image(
+//            painter = painterResource(id = R.drawable.background),
+//            contentDescription = "",
+//            modifier
+//                .heightIn(
+//                    max = animateDpAsState(
+//                        targetValue = dynamicHeight.dp
+//                    ).value
+//                )
+//                .fillMaxWidth(),
+//            contentScale = ContentScale.Crop
+//        )
         LazyColumn(
             modifier.heightIn(
                 max = animateDpAsState(
