@@ -95,16 +95,13 @@ fun DetailScreen(
         }
     }
     val scrollState = rememberScrollState(0)
-    Scaffold(
-        topBar = {
-            topScrollContent(
+    Scaffold {
+        Column {
+            TopScrollContent(
                 scrollState,
                 leagueEntryDTO = summonerLeague.value,
                 summonerDTO = currentSummoner.value
             )
-        }
-    ) {
-        Column {
             SummonerView(
                 Modifier,
                 leagueEntry = summonerLeague.value,
@@ -123,54 +120,60 @@ fun DetailScreen(
 }
 
 @Composable
-fun topScrollContent(
+fun TopScrollContent(
     scrollState: ScrollState,
     leagueEntryDTO: List<LeagueEntryDTO>,
     summonerDTO: SummonerDTO
 ) {
     val dynamicHeight = (250f - scrollState.value).coerceIn(130f, 250f)
-    TopAppBar(
-        Modifier
-            .heightIn(min = animateDpAsState(targetValue = dynamicHeight.dp).value)
-            .fillMaxWidth()
+    val modifier = Modifier
+        .heightIn(min = animateDpAsState(targetValue = dynamicHeight.dp).value)
+        .fillMaxWidth()
+    BoxWithConstraints(
+        modifier = modifier
     ) {
-        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = painterResource(id = R.drawable.background),
-                contentDescription = "backGround",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-            Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Image(
-                        painter = painterResource(id = R.drawable.profile_icon),
-                        contentDescription = "profile Image",
-                        Modifier
-                            .padding(15.dp)
-                            .width(100.dp)
-                            .height(100.dp)
-                            .clip(RoundedCornerShape(10.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                    Text(
-                        text = "${summonerDTO.name}",
-                        fontSize = 30.sp,
-                        modifier = Modifier.padding(top = 15.dp),
-                        fontStyle = FontStyle.Normal,
-                        color = Color.White
-                    )
-                }
+        Image(
+            painter = painterResource(id = R.drawable.background),
+            contentDescription = "backGround",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .heightIn(max = animateDpAsState(targetValue = dynamicHeight.dp).value)
+                .fillMaxSize(),
+        )
+        Column(
+            modifier.heightIn(
+                max = animateDpAsState(
+                    targetValue = dynamicHeight.dp
+                ).value
+            ).fillMaxSize(), verticalArrangement = Arrangement.Bottom
+        ) {
+            Row(modifier = modifier.fillMaxWidth()) {
+                Image(
+                    painter = painterResource(id = R.drawable.profile_icon),
+                    contentDescription = "profile Image",
+                    Modifier
+                        .padding(15.dp)
+                        .width(100.dp)
+                        .height(100.dp)
+                        .clip(RoundedCornerShape(10.dp)),
+                    contentScale = ContentScale.Crop
+                )
+                Text(
+                    text = "${summonerDTO.name}",
+                    fontSize = 30.sp,
+                    modifier = Modifier.padding(top = 15.dp),
+                    fontStyle = FontStyle.Normal,
+                    color = Color.White
+                )
             }
-            Text(
-                text = "${summonerDTO.summonerLevel}",
-                modifier = Modifier
-                    .padding(start = 50.dp, bottom = 10.dp)
-                    .align(Alignment.BottomStart),
-                color = Color.White,
-                fontSize = 20.sp
-            )
         }
+        Text(
+            text = "${summonerDTO.summonerLevel}",
+            modifier = Modifier
+                .padding(start = 50.dp, top = 100.dp),
+            color = Color.White,
+            fontSize = 20.sp
+        )
     }
 }
 
@@ -191,6 +194,18 @@ fun SummonerView(
                 ).value
             )
     ) {
+        Image(
+            painter = painterResource(id = R.drawable.background2),
+            contentDescription = "",
+            modifier
+                .heightIn(
+                    max = animateDpAsState(
+                        targetValue = dynamicHeight.dp
+                    ).value
+                )
+                .fillMaxWidth(),
+            contentScale = ContentScale.Crop
+        )
         LazyColumn(
             modifier.heightIn(
                 max = animateDpAsState(
@@ -264,7 +279,11 @@ fun MatchItemPreview() {
 @Preview
 @Composable
 fun TopImageViewPreview() {
-    TopImageView(summonerDTO = dummySummonerDTO)
+    TopScrollContent(
+        scrollState = ScrollState(0),
+        leagueEntryDTO = dummy,
+        summonerDTO = dummySummonerDTO
+    )
 }
 
 @Preview(heightDp = 300)
