@@ -55,7 +55,6 @@ internal class SummonerViewModelTest {
         val job = launch {
             viewModel.summonerState.collect {
                 when (it) {
-                    is SummonerState.UnInitialized -> assertEquals(SummonerState.UnInitialized, it)
                     is SummonerState.Loading -> assertEquals(SummonerState.Loading, it)
                     is SummonerState.Success -> assertEquals(SummonerState.Success(summonerDTO), it)
                     is SummonerState.LoadLeagueEntry -> assertEquals(

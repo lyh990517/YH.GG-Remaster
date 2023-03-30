@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import yunho.compose.screen.SearchScreen
+import yunho.compose.summonerinfo.DetailScreen
 import yunho.compose.yhgg_remaster.presentaion.viewmodel.MatchViewModel
 import yunho.compose.yhgg_remaster.presentaion.viewmodel.SummonerViewModel
 
@@ -27,7 +28,12 @@ fun YH_GG_App(
             "info/{summoner}",
             arguments = listOf(navArgument("summoner") { type = NavType.StringType })
         ) {
-
+            DetailScreen(
+                navigator = navigator,
+                summonerViewModel = summonerViewModel,
+                matchViewModel = matchViewModel,
+                summoner = it.arguments?.getString("summoner") ?: ""
+            )
         }
         composable("info/{summoner}/{matchId}") {
 

@@ -24,7 +24,6 @@ class SummonerViewModel @Inject constructor(
         getOneSummonerInfoUseCase.getInfo(summonerName).catch {
             _summonerState.value = SummonerState.Error(it)
         }.collect {
-            Log.e("123","${it}")
             _summonerState.value = SummonerState.Success(it)
         }
     }
