@@ -141,11 +141,13 @@ fun TopScrollContent(
                 .fillMaxSize(),
         )
         Column(
-            modifier.heightIn(
-                max = animateDpAsState(
-                    targetValue = dynamicHeight.dp
-                ).value
-            ).fillMaxSize(), verticalArrangement = Arrangement.Bottom
+            modifier
+                .heightIn(
+                    max = animateDpAsState(
+                        targetValue = dynamicHeight.dp
+                    ).value
+                )
+                .fillMaxSize(), verticalArrangement = Arrangement.Bottom
         ) {
             Row(modifier = modifier.fillMaxWidth()) {
                 Image(
@@ -206,7 +208,7 @@ fun SummonerView(
 //                .fillMaxWidth(),
 //            contentScale = ContentScale.Crop
 //        )
-        LazyColumn(
+        LazyRow(
             modifier.heightIn(
                 max = animateDpAsState(
                     targetValue = dynamicHeight.dp
@@ -222,25 +224,54 @@ fun SummonerView(
 
 @Composable
 fun RankItem(leagueEntry: LeagueEntryDTO) {
-    Text("League Id: ${leagueEntry.leagueId}")
-    Text("Summoner Id: ${leagueEntry.summonerId}")
-    Text("Summoner Name: ${leagueEntry.summonerName}")
-    Text("Queue Type: ${leagueEntry.queueType}")
-    Text("Tier: ${leagueEntry.tier}")
-    Text("Rank: ${leagueEntry.rank}")
-    Text("League Points: ${leagueEntry.leaguePoints}")
-    Text("Wins: ${leagueEntry.wins}")
-    Text("Losses: ${leagueEntry.losses}")
-    Text("Hot Streak: ${leagueEntry.hotStreak}")
-    Text("Veteran: ${leagueEntry.veteran}")
-    Text("Fresh Blood: ${leagueEntry.freshBlood}")
-    Text("Inactive: ${leagueEntry.inactive}")
-    leagueEntry.miniSeries?.let {
-        Text("Mini Series Wins: ${it.wins}")
-        Text("Mini Series Losses: ${it.losses}")
-        Text("Mini Series Target: ${it.target}")
-        Text("Mini Series Progress: ${it.progress}")
+    Column(Modifier.padding(10.dp).border(width = 2.dp, color = Color.Red)) {
+        Row(Modifier.padding(horizontal = 5.dp)) {
+            Column(Modifier.padding(vertical = 5.dp)) {
+                Image(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(100.dp),
+                    painter = painterResource(id = R.drawable.emblem_diamond),
+                    contentDescription = "tier"
+                )
+                Text("Queue Type: ${leagueEntry.queueType}")
+            }
+            Column(Modifier.padding(vertical = 5.dp)) {
+                Text("Tier: ${leagueEntry.tier}")
+                Text("Rank: ${leagueEntry.rank}")
+                Text("League Points: ${leagueEntry.leaguePoints}")
+                Row(Modifier) {
+                    Text("Wins: ${leagueEntry.wins}")
+                    Text("Losses: ${leagueEntry.losses}")
+                }
+            }
+        }
     }
+//    Text("League Id: ${leagueEntry.leagueId}")
+//    Text("Summoner Id: ${leagueEntry.summonerId}")
+//    Text("Summoner Name: ${leagueEntry.summonerName}")
+//    Text("Queue Type: ${leagueEntry.queueType}")
+//    Text("Tier: ${leagueEntry.tier}")
+//    Text("Rank: ${leagueEntry.rank}")
+//    Text("League Points: ${leagueEntry.leaguePoints}")
+//    Text("Wins: ${leagueEntry.wins}")
+//    Text("Losses: ${leagueEntry.losses}")
+//    Text("Hot Streak: ${leagueEntry.hotStreak}")
+//    Text("Veteran: ${leagueEntry.veteran}")
+//    Text("Fresh Blood: ${leagueEntry.freshBlood}")
+//    Text("Inactive: ${leagueEntry.inactive}")
+//    leagueEntry.miniSeries?.let {
+//        Text("Mini Series Wins: ${it.wins}")
+//        Text("Mini Series Losses: ${it.losses}")
+//        Text("Mini Series Target: ${it.target}")
+//        Text("Mini Series Progress: ${it.progress}")
+//    }
+}
+
+@Preview
+@Composable
+fun RankItemPreview() {
+    RankItem(leagueEntry = dummy[0])
 }
 
 @Composable
@@ -279,11 +310,11 @@ fun MatchItemPreview() {
 @Preview
 @Composable
 fun TopImageViewPreview() {
-    TopScrollContent(
-        scrollState = ScrollState(0),
-        leagueEntryDTO = dummy,
-        summonerDTO = dummySummonerDTO
-    )
+//    TopScrollContent(
+//        scrollState = ScrollState(0),
+//        leagueEntryDTO = dummy,
+//        summonerDTO = dummySummonerDTO
+//    )
 }
 
 @Preview(heightDp = 300)
