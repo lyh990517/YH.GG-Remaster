@@ -8,4 +8,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="rank_view">#B5B5B5</color>
+    <color name="badge">#B0DEF1</color>
+    <color name="badge_text">#0783B8</color>
 </resources>

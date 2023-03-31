@@ -289,7 +289,7 @@ val font_t = FontFamily(
 
 @Composable
 fun RankItem(leagueEntry: LeagueEntryDTO, modifier: Modifier = Modifier) {
-    Log.e("tier", "${leagueEntry}")
+    val rankType = if (leagueEntry.queueType == "RANKED_SOLO_5x5") "" else ""
     val rankImage = when (leagueEntry.tier) {
         "IRON" -> R.drawable.iron
         "BRONZE" -> R.drawable.bronze
@@ -340,7 +340,13 @@ fun RankItem(leagueEntry: LeagueEntryDTO, modifier: Modifier = Modifier) {
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.SpaceAround
             ) {
-                Text(leagueEntry.queueType, fontFamily = font)
+                Badge(backgroundColor = Color(LocalContext.current.getColor(R.color.badge))) {
+                    Text(
+                        leagueEntry.queueType,
+                        fontFamily = font,
+                        color = Color(LocalContext.current.getColor(R.color.badge_text))
+                    )
+                }
                 Text(
                     "${leagueEntry.tier} ${leagueEntry.rank}",
                     Modifier.padding(end = 15.dp),
