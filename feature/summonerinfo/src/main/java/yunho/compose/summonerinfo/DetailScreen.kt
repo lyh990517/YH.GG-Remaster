@@ -9,10 +9,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -20,13 +19,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import yunho.compose.domain.model.LeagueEntryDTO
 import yunho.compose.domain.model.MatchDTO
 import yunho.compose.domain.model.SummonerDTO
@@ -98,8 +100,8 @@ fun DetailScreen(
     Scaffold {
         Column {
             TopScrollContent(
-                scrollState,
-                leagueEntryDTO = summonerLeague.value,
+                navigator = navigator,
+                scrollState = scrollState,
                 summonerDTO = currentSummoner.value
             )
             SummonerView(
@@ -121,8 +123,8 @@ fun DetailScreen(
 
 @Composable
 fun TopScrollContent(
+    navigator: NavController,
     scrollState: ScrollState,
-    leagueEntryDTO: List<LeagueEntryDTO>,
     summonerDTO: SummonerDTO
 ) {
     val dynamicHeight = (250f - scrollState.value).coerceIn(130f, 250f)
@@ -141,7 +143,7 @@ fun TopScrollContent(
                 .fillMaxSize(),
         )
         Column(
-            modifier
+            Modifier
                 .heightIn(
                     max = animateDpAsState(
                         targetValue = dynamicHeight.dp
@@ -149,33 +151,45 @@ fun TopScrollContent(
                 )
                 .fillMaxSize(), verticalArrangement = Arrangement.Bottom
         ) {
-            Row(modifier = modifier.fillMaxWidth()) {
-                Image(
-                    painter = painterResource(id = R.drawable.profile_icon),
-                    contentDescription = "profile Image",
-                    Modifier
-                        .padding(15.dp)
-                        .width(100.dp)
-                        .height(100.dp)
-                        .clip(RoundedCornerShape(10.dp)),
-                    contentScale = ContentScale.Crop
-                )
-                Text(
-                    text = "${summonerDTO.name}",
-                    fontSize = 30.sp,
-                    modifier = Modifier.padding(top = 15.dp),
-                    fontStyle = FontStyle.Normal,
-                    color = Color.White
+            Column(Modifier) {
+                Row(modifier = Modifier) {
+                    Image(
+                        painter = painterResource(id = R.drawable.profile_icon),
+                        contentDescription = "profile Image",
+                        Modifier
+                            .padding(start = 15.dp, end = 15.dp, top = 15.dp, bottom = 15.dp)
+                            .width(100.dp)
+                            .height(100.dp)
+                            .clip(RoundedCornerShape(10.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                    Text(
+                        text = summonerDTO.name,
+                        fontSize = 30.sp,
+                        modifier = Modifier.padding(top = 15.dp),
+                        fontStyle = FontStyle.Normal,
+                        color = Color.White
+                    )
+                }
+                if (dynamicHeight.dp != 130.dp) Text(
+                    text = "${summonerDTO.summonerLevel}",
+                    modifier = Modifier.padding(start = 50.dp, bottom = 5.dp),
+                    color = Color.White,
+                    fontSize = 20.sp
                 )
             }
         }
-        Text(
-            text = "${summonerDTO.summonerLevel}",
-            modifier = Modifier
-                .padding(start = 50.dp, top = 100.dp),
-            color = Color.White,
-            fontSize = 20.sp
-        )
+        if (dynamicHeight.dp != 130.dp) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "",
+                tint = Color.White,
+                modifier = Modifier
+                    .padding(15.dp)
+                    .clickable {
+                        navigator.popBackStack()
+                    })
+        }
     }
 }
 
@@ -196,24 +210,16 @@ fun SummonerView(
                 ).value
             )
     ) {
-//        Image(
-//            painter = painterResource(id = R.drawable.background),
-//            contentDescription = "",
-//            modifier
-//                .heightIn(
-//                    max = animateDpAsState(
-//                        targetValue = dynamicHeight.dp
-//                    ).value
-//                )
-//                .fillMaxWidth(),
-//            contentScale = ContentScale.Crop
-//        )
         LazyRow(
-            modifier.heightIn(
-                max = animateDpAsState(
-                    targetValue = dynamicHeight.dp
-                ).value
-            )
+            modifier
+                .heightIn(
+                    max = animateDpAsState(
+                        targetValue = dynamicHeight.dp
+                    ).value
+                )
+                .fillMaxWidth()
+                .background(Color(ContextCompat.getColor(LocalContext.current, R.color.rank_view))),
+            horizontalArrangement = Arrangement.SpaceAround
         ) {
             items(leagueEntry) {
                 RankItem(leagueEntry = it)
@@ -224,9 +230,20 @@ fun SummonerView(
 
 @Composable
 fun RankItem(leagueEntry: LeagueEntryDTO) {
-    Column(Modifier.padding(10.dp).border(width = 2.dp, color = Color.Red)) {
-        Row(Modifier.padding(horizontal = 5.dp)) {
-            Column(Modifier.padding(vertical = 5.dp)) {
+    Column(
+        Modifier
+            .padding(3.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .border(width = 1.dp, color = Color.Cyan, shape = RoundedCornerShape(20.dp))
+            .fillMaxWidth()
+            .background(Color.White)
+    ) {
+        Row(
+            Modifier
+                .padding(horizontal = 5.dp)
+                .fillMaxWidth()
+        ) {
+            Column(Modifier.padding(vertical = 5.dp, horizontal = 10.dp)) {
                 Image(
                     modifier = Modifier
                         .width(100.dp)
@@ -234,38 +251,20 @@ fun RankItem(leagueEntry: LeagueEntryDTO) {
                     painter = painterResource(id = R.drawable.emblem_diamond),
                     contentDescription = "tier"
                 )
-                Text("Queue Type: ${leagueEntry.queueType}")
+                Text(leagueEntry.queueType)
             }
-            Column(Modifier.padding(vertical = 5.dp)) {
+            Column(
+                Modifier.padding(vertical = 5.dp),
+                verticalArrangement = Arrangement.SpaceAround
+            ) {
                 Text("Tier: ${leagueEntry.tier}")
                 Text("Rank: ${leagueEntry.rank}")
                 Text("League Points: ${leagueEntry.leaguePoints}")
-                Row(Modifier) {
-                    Text("Wins: ${leagueEntry.wins}")
-                    Text("Losses: ${leagueEntry.losses}")
-                }
+                Text("Wins: ${leagueEntry.wins}")
+                Text("Losses: ${leagueEntry.losses}")
             }
         }
     }
-//    Text("League Id: ${leagueEntry.leagueId}")
-//    Text("Summoner Id: ${leagueEntry.summonerId}")
-//    Text("Summoner Name: ${leagueEntry.summonerName}")
-//    Text("Queue Type: ${leagueEntry.queueType}")
-//    Text("Tier: ${leagueEntry.tier}")
-//    Text("Rank: ${leagueEntry.rank}")
-//    Text("League Points: ${leagueEntry.leaguePoints}")
-//    Text("Wins: ${leagueEntry.wins}")
-//    Text("Losses: ${leagueEntry.losses}")
-//    Text("Hot Streak: ${leagueEntry.hotStreak}")
-//    Text("Veteran: ${leagueEntry.veteran}")
-//    Text("Fresh Blood: ${leagueEntry.freshBlood}")
-//    Text("Inactive: ${leagueEntry.inactive}")
-//    leagueEntry.miniSeries?.let {
-//        Text("Mini Series Wins: ${it.wins}")
-//        Text("Mini Series Losses: ${it.losses}")
-//        Text("Mini Series Target: ${it.target}")
-//        Text("Mini Series Progress: ${it.progress}")
-//    }
 }
 
 @Preview
@@ -310,11 +309,11 @@ fun MatchItemPreview() {
 @Preview
 @Composable
 fun TopImageViewPreview() {
-//    TopScrollContent(
-//        scrollState = ScrollState(0),
-//        leagueEntryDTO = dummy,
-//        summonerDTO = dummySummonerDTO
-//    )
+    TopScrollContent(
+        navigator = rememberNavController(),
+        scrollState = ScrollState(0),
+        summonerDTO = dummySummonerDTO
+    )
 }
 
 @Preview(heightDp = 300)
