@@ -26,6 +26,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -187,7 +189,7 @@ fun TopScrollContent(
                         text = summonerDTO.name,
                         fontSize = 30.sp,
                         modifier = Modifier.padding(top = 15.dp),
-                        fontStyle = FontStyle.Normal,
+                        fontFamily = font_t,
                         color = Color.White
                     )
                 }
@@ -278,20 +280,27 @@ fun SummonerView(
     }
 }
 
+val font = FontFamily(
+    Font(R.font.font)
+)
+val font_t = FontFamily(
+    Font(R.font.font_thick)
+)
+
 @Composable
 fun RankItem(leagueEntry: LeagueEntryDTO, modifier: Modifier = Modifier) {
     Log.e("tier", "${leagueEntry}")
     val rankImage = when (leagueEntry.tier) {
-        "IRON" -> R.drawable.emblem_iron
-        "BRONZE" -> R.drawable.emblem_bronze
-        "SILVER" -> R.drawable.emblem_silver
-        "GOLD" -> R.drawable.emblem_gold
-        "PLATINUM" -> R.drawable.emblem_platinum
-        "DIAMOND" -> R.drawable.emblem_diamond
-        "MASTER" -> R.drawable.emblem_master
-        "GRANDMASTER" -> R.drawable.emblem_grandmaster
-        "CHALLENGER" -> R.drawable.emblem_challenger
-        else -> R.drawable.teemo
+        "IRON" -> R.drawable.iron
+        "BRONZE" -> R.drawable.bronze
+        "SILVER" -> R.drawable.silver
+        "GOLD" -> R.drawable.gold
+        "PLATINUM" -> R.drawable.platnum
+        "DIAMOND" -> R.drawable.diamond
+        "MASTER" -> R.drawable.master
+        "GRANDMASTER" -> R.drawable.grandmaster
+        "CHALLENGER" -> R.drawable.challenger
+        else -> R.drawable.unrank
     }
     Column(
         modifier = modifier
@@ -331,13 +340,18 @@ fun RankItem(leagueEntry: LeagueEntryDTO, modifier: Modifier = Modifier) {
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.SpaceAround
             ) {
-                Text(leagueEntry.queueType)
-                Text("${leagueEntry.tier} ${leagueEntry.rank}", Modifier.padding(end = 15.dp))
-                Text("LP: ${leagueEntry.leaguePoints}")
+                Text(leagueEntry.queueType, fontFamily = font)
+                Text(
+                    "${leagueEntry.tier} ${leagueEntry.rank}",
+                    Modifier.padding(end = 15.dp),
+                    fontFamily = font_t,
+                    fontSize = 18.sp
+                )
+                Text("LP: ${leagueEntry.leaguePoints}", fontFamily = font)
                 Row(Modifier, horizontalArrangement = Arrangement.Center) {
-                    Text("${leagueEntry.wins}:승")
+                    Text("${leagueEntry.wins}:승", fontFamily = font)
                     Spacer(modifier = Modifier.padding(horizontal = 5.dp))
-                    Text("${leagueEntry.losses}:패")
+                    Text("${leagueEntry.losses}:패", fontFamily = font)
                 }
             }
         }
