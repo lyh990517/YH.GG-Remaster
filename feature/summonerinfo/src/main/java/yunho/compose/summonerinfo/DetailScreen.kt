@@ -218,27 +218,6 @@ fun TopScrollContent(
                         //즐겨찾기
                     })
         }
-        if (dynamicHeight.dp != 130.dp) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = "",
-                tint = Color.White,
-                modifier = Modifier
-                    .padding(15.dp)
-                    .clickable {
-                        navigator.popBackStack()
-                    })
-            Icon(
-                imageVector = Icons.Default.Star,
-                contentDescription = "",
-                tint = Color.Yellow,
-                modifier = Modifier
-                    .padding(15.dp)
-                    .align(Alignment.TopEnd)
-                    .clickable {
-                        //즐겨찾기
-                    })
-        }
         if (dynamicHeight.dp == 130.dp) {
             Icon(
                 imageVector = Icons.Default.KeyboardArrowUp,
@@ -263,7 +242,7 @@ fun SummonerView(
     leagueEntry: List<LeagueEntryDTO>,
     scrollState: ScrollState
 ) {
-    val dynamicHeight = (150f - scrollState.value).coerceIn(0f, 150f)
+    val dynamicHeight = (120f - scrollState.value).coerceIn(0f, 120f)
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -277,58 +256,70 @@ fun SummonerView(
         LazyRow(
             modifier
                 .heightIn(
-                    max = animateDpAsState(
-                        targetValue = dynamicHeight.dp
-                    ).value
+                    max = animateDpAsState(targetValue = dynamicHeight.dp).value
                 )
                 .fillMaxWidth()
                 .background(Color(ContextCompat.getColor(LocalContext.current, R.color.rank_view))),
-            horizontalArrangement = Arrangement.SpaceAround
+            horizontalArrangement = Arrangement.Start
         ) {
             items(leagueEntry) {
-                RankItem(leagueEntry = it)
+                RankItem(
+                    leagueEntry = it,
+                    modifier
+                        .heightIn(
+                            max = animateDpAsState(targetValue = dynamicHeight.dp).value
+                        )
+                        .fillMaxSize()
+                )
             }
         }
     }
 }
 
 @Composable
-fun RankItem(leagueEntry: LeagueEntryDTO) {
-    val screenWidth = with(LocalContext.current.resources.displayMetrics) {
-        (LocalConfiguration.current.screenWidthDp)
-    }
+fun RankItem(leagueEntry: LeagueEntryDTO, modifier: Modifier = Modifier) {
     Column(
-        Modifier
+        modifier = modifier
             .padding(3.dp)
             .clip(RoundedCornerShape(20.dp))
             .border(width = 1.dp, color = Color.Cyan, shape = RoundedCornerShape(20.dp))
-            .width(screenWidth.dp - 8.dp)
             .background(Color.White)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center
     ) {
         Row(
-            Modifier
+            modifier
                 .padding(horizontal = 5.dp)
                 .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
         ) {
-            Column(Modifier.padding(vertical = 5.dp, horizontal = 10.dp)) {
+            Column(
+                Modifier
+                    .padding(vertical = 5.dp, horizontal = 10.dp)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceAround
+            ) {
                 Image(
                     modifier = Modifier
-                        .width(100.dp)
-                        .height(100.dp),
+                        .width(80.dp)
+                        .height(80.dp),
                     painter = painterResource(id = R.drawable.emblem_diamond),
                     contentDescription = "tier"
                 )
-                Text(leagueEntry.queueType)
             }
             Column(
-                Modifier.padding(vertical = 5.dp),
+                Modifier
+                    .padding(10.dp)
+                    .fillMaxHeight(),
                 verticalArrangement = Arrangement.SpaceAround
             ) {
-                Text("Tier: ${leagueEntry.tier}")
-                Text("Rank: ${leagueEntry.rank}")
-                Text("League Points: ${leagueEntry.leaguePoints}")
-                Text("Wins: ${leagueEntry.wins}")
-                Text("Losses: ${leagueEntry.losses}")
+                Text(leagueEntry.queueType)
+                Text("${leagueEntry.tier} ${leagueEntry.rank}",Modifier.padding(end = 15.dp))
+                Text("LP: ${leagueEntry.leaguePoints}")
+                Row(Modifier, horizontalArrangement = Arrangement.Center) {
+                    Text("${leagueEntry.wins}:승")
+                    Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+                    Text("${leagueEntry.losses}:패")
+                }
             }
         }
     }
