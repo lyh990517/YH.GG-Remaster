@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -36,6 +37,9 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberImagePainter
+import com.bumptech.glide.request.RequestOptions
+import com.google.accompanist.coil.rememberCoilPainter
 import kotlinx.coroutines.launch
 import yunho.compose.domain.model.LeagueEntryDTO
 import yunho.compose.domain.model.MatchDTO
@@ -141,13 +145,26 @@ private fun MatchView(
         }
     }
 }
-
+@Composable
+fun ImageFromUrl(
+    url: String,
+    contentDescription: String?,
+) {
+    val painter: Painter = rememberCoilPainter(request = url)
+    Image(
+        painter = painter,
+        contentDescription = contentDescription,
+    )
+}
 @Composable
 fun TopScrollContent(
     navigator: NavController,
     scrollState: ScrollState,
     summonerDTO: SummonerDTO
 ) {
+    Log.e("image",
+        LocalContext.current.getString(R.string.PROFILE_ICON_BASE_URL)+"${summonerDTO.profileIconId}.png"
+    )
     val dynamicHeight = (250f - scrollState.value).coerceIn(130f, 250f)
     val scope = rememberCoroutineScope()
     val modifier = Modifier
@@ -176,7 +193,7 @@ fun TopScrollContent(
             Column(Modifier) {
                 Row(modifier = Modifier) {
                     Image(
-                        painter = painterResource(id = R.drawable.profile_icon),
+                        painter = rememberCoilPainter(request = LocalContext.current.getString(R.string.PROFILE_ICON_BASE_URL)+"${summonerDTO.profileIconId}.png"),
                         contentDescription = "profile Image",
                         Modifier
                             .padding(start = 15.dp, end = 15.dp, top = 15.dp, bottom = 15.dp)
