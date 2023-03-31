@@ -37,9 +37,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
-import com.bumptech.glide.request.RequestOptions
-import com.google.accompanist.coil.rememberCoilPainter
 import kotlinx.coroutines.launch
 import yunho.compose.domain.model.LeagueEntryDTO
 import yunho.compose.domain.model.MatchDTO
@@ -81,8 +80,7 @@ fun DetailScreen(
         }
         is SummonerState.LoadLeagueEntry -> {
             val leagueEntryDTO = summonerState as SummonerState.LoadLeagueEntry
-            summonerLeague.value =
-                leagueEntryDTO.data.ifEmpty { listOf() }
+            summonerLeague.value = leagueEntryDTO.data.ifEmpty { listOf() }
         }
         is SummonerState.Error -> {
 
@@ -114,17 +112,14 @@ fun DetailScreen(
             TopScrollContent(
                 navigator = navigator,
                 scrollState = scrollState,
-                summonerDTO = currentSummoner.value
+                summonerDTO = currentSummoner.value,
+                matchList = matchList
             )
             RankView(
-                Modifier,
-                leagueEntry = summonerLeague.value,
-                scrollState = scrollState
+                Modifier, leagueEntry = summonerLeague.value, scrollState = scrollState
             )
             MatchView(
-                Modifier.weight(1f),
-                itemList = matchList,
-                scrollState = scrollState
+                Modifier.weight(1f), itemList = matchList, scrollState = scrollState
             )
         }
     }
@@ -145,38 +140,42 @@ private fun MatchView(
         }
     }
 }
-@Composable
-fun ImageFromUrl(
-    url: String,
-    contentDescription: String?,
-) {
-    val painter: Painter = rememberCoilPainter(request = url)
-    Image(
-        painter = painter,
-        contentDescription = contentDescription,
-    )
-}
+
 @Composable
 fun TopScrollContent(
     navigator: NavController,
     scrollState: ScrollState,
-    summonerDTO: SummonerDTO
+    summonerDTO: SummonerDTO,
+    matchList: List<MatchState.Success>
 ) {
     val dynamicHeight = (250f - scrollState.value).coerceIn(130f, 250f)
     val scope = rememberCoroutineScope()
     val modifier = Modifier
         .heightIn(min = animateDpAsState(targetValue = dynamicHeight.dp).value)
         .fillMaxWidth()
+    val profile =
+        LocalContext.current.getString(R.string.PROFILE_ICON_BASE_URL) + "${summonerDTO.profileIconId}.png"
+    val data =
+        if (matchList.isNotEmpty()) LocalContext.current.getString(R.string.CHAMPION_IMAGE_BASE_URL) +
+                "${matchList[0].matchData.info.participants[0].championName}_0.jpg" else ""
+    val background = remember {
+        mutableStateOf(data)
+    }
+    background.value = data
+    Log.e("back", background.value)
     BoxWithConstraints(
         modifier = modifier
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.background2),
+        AsyncImage(
+            model = background.value,
             contentDescription = "backGround",
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .heightIn(max = animateDpAsState(targetValue = dynamicHeight.dp).value)
                 .fillMaxSize(),
+            onError = {
+                Log.e("error","${it.result.throwable.message}")
+            }
         )
         Column(
             Modifier
@@ -188,9 +187,10 @@ fun TopScrollContent(
                 .fillMaxSize(), verticalArrangement = Arrangement.Bottom
         ) {
             Column(Modifier) {
+
                 Row(modifier = Modifier) {
-                    Image(
-                        painter = rememberCoilPainter(request = LocalContext.current.getString(R.string.PROFILE_ICON_BASE_URL)+"${summonerDTO.profileIconId}.png"),
+                    AsyncImage(
+                        model = profile,
                         contentDescription = "profile Image",
                         Modifier
                             .padding(start = 15.dp, end = 15.dp, top = 15.dp, bottom = 15.dp)
@@ -216,8 +216,7 @@ fun TopScrollContent(
             }
         }
         if (dynamicHeight.dp != 130.dp) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
+            Icon(imageVector = Icons.Default.ArrowBack,
                 contentDescription = "",
                 tint = Color.White,
                 modifier = Modifier
@@ -225,8 +224,7 @@ fun TopScrollContent(
                     .clickable {
                         navigator.popBackStack()
                     })
-            Icon(
-                imageVector = Icons.Default.Star,
+            Icon(imageVector = Icons.Default.Star,
                 contentDescription = "",
                 tint = Color.Yellow,
                 modifier = Modifier
@@ -237,8 +235,7 @@ fun TopScrollContent(
                     })
         }
         if (dynamicHeight.dp == 130.dp) {
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowUp,
+            Icon(imageVector = Icons.Default.KeyboardArrowUp,
                 contentDescription = "",
                 tint = Color.White,
                 modifier = Modifier
@@ -256,9 +253,7 @@ fun TopScrollContent(
 
 @Composable
 fun RankView(
-    modifier: Modifier,
-    leagueEntry: List<LeagueEntryDTO>,
-    scrollState: ScrollState
+    modifier: Modifier, leagueEntry: List<LeagueEntryDTO>, scrollState: ScrollState
 ) {
     val dynamicHeight = (120f - scrollState.value).coerceIn(0f, 120f)
     Box(
@@ -380,13 +375,13 @@ fun RankItem(leagueEntry: LeagueEntryDTO, modifier: Modifier = Modifier) {
                 shape = RoundedCornerShape(20.dp)
             )
             .background(Color.White)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center
+            .fillMaxSize(), verticalArrangement = Arrangement.Center
     ) {
         Row(
             modifier
                 .padding(horizontal = 5.dp)
-                .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceAround
         ) {
             Column(
                 Modifier
@@ -461,11 +456,11 @@ fun MatchItemPreview() {
 @Preview
 @Composable
 fun TopImageViewPreview() {
-    TopScrollContent(
-        navigator = rememberNavController(),
-        scrollState = ScrollState(0),
-        summonerDTO = dummySummonerDTO
-    )
+//    TopScrollContent(
+//        navigator = rememberNavController(),
+//        scrollState = ScrollState(0),
+//        summonerDTO = dummySummonerDTO
+//    )
 }
 
 @Preview(heightDp = 300)
@@ -480,41 +475,39 @@ fun MatchViewPreview() {
     MatchView(itemList = mutableListOf(), scrollState = ScrollState(0))
 }
 
-val dummy =
-    listOf(
-        LeagueEntryDTO(
-            leagueId = "",
-            summonerId = "",
-            summonerName = "",
-            queueType = "RANKED_SOLO_5x5",
-            tier = "UNRANK",
-            rank = "",
-            leaguePoints = 0,
-            wins = 0,
-            losses = 0,
-            hotStreak = false,
-            veteran = false,
-            freshBlood = false,
-            inactive = false,
-            miniSeries = null
-        ),
-        LeagueEntryDTO(
-            leagueId = "",
-            summonerId = "",
-            summonerName = "",
-            queueType = "RANKED_FLEX_5x5",
-            tier = "UNRANK",
-            rank = "",
-            leaguePoints = 0,
-            wins = 0,
-            losses = 0,
-            hotStreak = false,
-            veteran = false,
-            freshBlood = false,
-            inactive = false,
-            miniSeries = null
-        )
+val dummy = listOf(
+    LeagueEntryDTO(
+        leagueId = "",
+        summonerId = "",
+        summonerName = "",
+        queueType = "RANKED_SOLO_5x5",
+        tier = "UNRANK",
+        rank = "",
+        leaguePoints = 0,
+        wins = 0,
+        losses = 0,
+        hotStreak = false,
+        veteran = false,
+        freshBlood = false,
+        inactive = false,
+        miniSeries = null
+    ), LeagueEntryDTO(
+        leagueId = "",
+        summonerId = "",
+        summonerName = "",
+        queueType = "RANKED_FLEX_5x5",
+        tier = "UNRANK",
+        rank = "",
+        leaguePoints = 0,
+        wins = 0,
+        losses = 0,
+        hotStreak = false,
+        veteran = false,
+        freshBlood = false,
+        inactive = false,
+        miniSeries = null
     )
+)
 
 val dummySummonerDTO = SummonerDTO(
     accountId = "dummyAccountId",
