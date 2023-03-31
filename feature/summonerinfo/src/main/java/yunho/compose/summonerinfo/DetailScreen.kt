@@ -266,15 +266,45 @@ fun SummonerView(
                 .background(Color.White),
             horizontalArrangement = Arrangement.Start
         ) {
-            items(leagueEntry) {
-                RankItem(
-                    leagueEntry = it,
-                    modifier
-                        .heightIn(
-                            max = animateDpAsState(targetValue = dynamicHeight.dp).value
+            when {
+                leagueEntry.size == 1 && leagueEntry[0].queueType == "RANKED_SOLO_5x5" -> {
+                    val rankList = listOf(leagueEntry[0], dummy[1])
+                    items(rankList) {
+                        RankItem(
+                            leagueEntry = it,
+                            modifier
+                                .heightIn(
+                                    max = animateDpAsState(targetValue = dynamicHeight.dp).value
+                                )
+                                .fillMaxSize()
                         )
-                        .fillMaxSize()
-                )
+                    }
+                }
+                leagueEntry.size == 1 && leagueEntry[0].queueType != "RANKED_SOLO_5x5" -> {
+                    val rankList = listOf(leagueEntry[0], dummy[0])
+                    items(rankList) {
+                        RankItem(
+                            leagueEntry = it,
+                            modifier
+                                .heightIn(
+                                    max = animateDpAsState(targetValue = dynamicHeight.dp).value
+                                )
+                                .fillMaxSize()
+                        )
+                    }
+                }
+                leagueEntry.isEmpty() -> {
+                    items(dummy) {
+                        RankItem(
+                            leagueEntry = it,
+                            modifier
+                                .heightIn(
+                                    max = animateDpAsState(targetValue = dynamicHeight.dp).value
+                                )
+                                .fillMaxSize()
+                        )
+                    }
+                }
             }
         }
     }
@@ -289,7 +319,7 @@ val font_t = FontFamily(
 
 @Composable
 fun RankItem(leagueEntry: LeagueEntryDTO, modifier: Modifier = Modifier) {
-    val rankType = if (leagueEntry.queueType == "RANKED_SOLO_5x5") "" else ""
+    val rankType = if (leagueEntry.queueType == "RANKED_SOLO_5x5") "개인/2인 랭크" else "자유 랭크"
     val rankImage = when (leagueEntry.tier) {
         "IRON" -> R.drawable.iron
         "BRONZE" -> R.drawable.bronze
@@ -342,7 +372,7 @@ fun RankItem(leagueEntry: LeagueEntryDTO, modifier: Modifier = Modifier) {
             ) {
                 Badge(backgroundColor = Color(LocalContext.current.getColor(R.color.badge))) {
                     Text(
-                        leagueEntry.queueType,
+                        rankType,
                         fontFamily = font,
                         color = Color(LocalContext.current.getColor(R.color.badge_text))
                     )
@@ -415,12 +445,28 @@ fun MatchViewPreview() {
 val dummy =
     listOf(
         LeagueEntryDTO(
-            leagueId = "dummyLeagueId",
-            summonerId = "dummySummonerId",
-            summonerName = "Dummy Summoner Name",
-            queueType = "dummyQueueType",
-            tier = "dummyTier",
-            rank = "dummyRank",
+            leagueId = "",
+            summonerId = "",
+            summonerName = "",
+            queueType = "RANKED_SOLO_5x5",
+            tier = "UNRANK",
+            rank = "",
+            leaguePoints = 0,
+            wins = 0,
+            losses = 0,
+            hotStreak = false,
+            veteran = false,
+            freshBlood = false,
+            inactive = false,
+            miniSeries = null
+        ),
+        LeagueEntryDTO(
+            leagueId = "",
+            summonerId = "",
+            summonerName = "",
+            queueType = "RANKED_FLEX_5x5",
+            tier = "UNRANK",
+            rank = "",
             leaguePoints = 0,
             wins = 0,
             losses = 0,
