@@ -112,7 +112,7 @@ fun DetailScreen(
                 scrollState = scrollState,
                 summonerDTO = currentSummoner.value
             )
-            SummonerView(
+            RankView(
                 Modifier,
                 leagueEntry = summonerLeague.value,
                 scrollState = scrollState
@@ -241,7 +241,7 @@ fun TopScrollContent(
 }
 
 @Composable
-fun SummonerView(
+fun RankView(
     modifier: Modifier,
     leagueEntry: List<LeagueEntryDTO>,
     scrollState: ScrollState
@@ -250,63 +250,75 @@ fun SummonerView(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(Color.White)
+            .background(Color(LocalContext.current.getColor(R.color.spacer)))
             .heightIn(
                 min = animateDpAsState(
                     targetValue = dynamicHeight.dp
                 ).value
             )
     ) {
-        LazyRow(
-            modifier
-                .heightIn(
-                    max = animateDpAsState(targetValue = dynamicHeight.dp).value
-                )
+        Column(
+            modifier = modifier
                 .fillMaxWidth()
-                .background(Color.White),
-            horizontalArrangement = Arrangement.Start
+                .background(Color(LocalContext.current.getColor(R.color.spacer)))
+                .heightIn(
+                    min = animateDpAsState(
+                        targetValue = dynamicHeight.dp
+                    ).value
+                )
         ) {
-            when {
-                leagueEntry.size == 1 && leagueEntry[0].queueType == "RANKED_SOLO_5x5" -> {
-                    val rankList = listOf(leagueEntry[0], dummy[1])
-                    items(rankList) {
-                        RankItem(
-                            leagueEntry = it,
-                            modifier
-                                .heightIn(
-                                    max = animateDpAsState(targetValue = dynamicHeight.dp).value
-                                )
-                                .fillMaxSize()
-                        )
+            LazyRow(
+                modifier
+                    .heightIn(
+                        max = animateDpAsState(targetValue = dynamicHeight.dp).value
+                    )
+                    .fillMaxWidth()
+                    .background(Color(LocalContext.current.getColor(R.color.spacer))),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                when {
+                    leagueEntry.size == 1 && leagueEntry[0].queueType == "RANKED_SOLO_5x5" -> {
+                        val rankList = listOf(leagueEntry[0], dummy[1])
+                        items(rankList) {
+                            RankItem(
+                                leagueEntry = it,
+                                modifier
+                                    .heightIn(
+                                        max = animateDpAsState(targetValue = dynamicHeight.dp).value
+                                    )
+                                    .fillMaxSize()
+                            )
+                        }
                     }
-                }
-                leagueEntry.size == 1 && leagueEntry[0].queueType != "RANKED_SOLO_5x5" -> {
-                    val rankList = listOf(leagueEntry[0], dummy[0])
-                    items(rankList) {
-                        RankItem(
-                            leagueEntry = it,
-                            modifier
-                                .heightIn(
-                                    max = animateDpAsState(targetValue = dynamicHeight.dp).value
-                                )
-                                .fillMaxSize()
-                        )
+                    leagueEntry.size == 1 && leagueEntry[0].queueType != "RANKED_SOLO_5x5" -> {
+                        val rankList = listOf(leagueEntry[0], dummy[0])
+                        items(rankList) {
+                            RankItem(
+                                leagueEntry = it,
+                                modifier
+                                    .heightIn(
+                                        max = animateDpAsState(targetValue = dynamicHeight.dp).value
+                                    )
+                                    .fillMaxSize()
+                            )
+                        }
                     }
-                }
-                leagueEntry.isEmpty() -> {
-                    items(dummy) {
-                        RankItem(
-                            leagueEntry = it,
-                            modifier
-                                .heightIn(
-                                    max = animateDpAsState(targetValue = dynamicHeight.dp).value
-                                )
-                                .fillMaxSize()
-                        )
+                    leagueEntry.isEmpty() -> {
+                        items(dummy) {
+                            RankItem(
+                                leagueEntry = it,
+                                modifier
+                                    .heightIn(
+                                        max = animateDpAsState(targetValue = dynamicHeight.dp).value
+                                    )
+                                    .fillMaxSize()
+                            )
+                        }
                     }
                 }
             }
         }
+
     }
 }
 
@@ -433,7 +445,7 @@ fun TopImageViewPreview() {
 @Preview(heightDp = 300)
 @Composable
 fun SummonerViewPreview() {
-    SummonerView(leagueEntry = dummy, modifier = Modifier, scrollState = ScrollState(0))
+    RankView(leagueEntry = dummy, modifier = Modifier, scrollState = ScrollState(0))
 }
 
 @Preview
