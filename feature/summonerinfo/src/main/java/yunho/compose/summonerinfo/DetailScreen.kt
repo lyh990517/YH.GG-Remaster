@@ -1,7 +1,9 @@
 package yunho.compose.summonerinfo
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -259,7 +261,7 @@ fun SummonerView(
                     max = animateDpAsState(targetValue = dynamicHeight.dp).value
                 )
                 .fillMaxWidth()
-                .background(Color(ContextCompat.getColor(LocalContext.current, R.color.rank_view))),
+                .background(Color.White),
             horizontalArrangement = Arrangement.Start
         ) {
             items(leagueEntry) {
@@ -278,11 +280,28 @@ fun SummonerView(
 
 @Composable
 fun RankItem(leagueEntry: LeagueEntryDTO, modifier: Modifier = Modifier) {
+    Log.e("tier", "${leagueEntry}")
+    val rankImage = when (leagueEntry.tier) {
+        "IRON" -> R.drawable.emblem_iron
+        "BRONZE" -> R.drawable.emblem_bronze
+        "SILVER" -> R.drawable.emblem_silver
+        "GOLD" -> R.drawable.emblem_gold
+        "PLATINUM" -> R.drawable.emblem_platinum
+        "DIAMOND" -> R.drawable.emblem_diamond
+        "MASTER" -> R.drawable.emblem_master
+        "GRANDMASTER" -> R.drawable.emblem_grandmaster
+        "CHALLENGER" -> R.drawable.emblem_challenger
+        else -> R.drawable.teemo
+    }
     Column(
         modifier = modifier
             .padding(3.dp)
             .clip(RoundedCornerShape(20.dp))
-            .border(width = 1.dp, color = Color.Cyan, shape = RoundedCornerShape(20.dp))
+            .border(
+                width = 1.dp,
+                color = Color(ContextCompat.getColor(LocalContext.current, R.color.rank_view)),
+                shape = RoundedCornerShape(20.dp)
+            )
             .background(Color.White)
             .fillMaxSize(),
         verticalArrangement = Arrangement.Center
@@ -302,7 +321,7 @@ fun RankItem(leagueEntry: LeagueEntryDTO, modifier: Modifier = Modifier) {
                     modifier = Modifier
                         .width(80.dp)
                         .height(80.dp),
-                    painter = painterResource(id = R.drawable.emblem_diamond),
+                    painter = painterResource(id = rankImage),
                     contentDescription = "tier"
                 )
             }
@@ -313,7 +332,7 @@ fun RankItem(leagueEntry: LeagueEntryDTO, modifier: Modifier = Modifier) {
                 verticalArrangement = Arrangement.SpaceAround
             ) {
                 Text(leagueEntry.queueType)
-                Text("${leagueEntry.tier} ${leagueEntry.rank}",Modifier.padding(end = 15.dp))
+                Text("${leagueEntry.tier} ${leagueEntry.rank}", Modifier.padding(end = 15.dp))
                 Text("LP: ${leagueEntry.leaguePoints}")
                 Row(Modifier, horizontalArrangement = Arrangement.Center) {
                     Text("${leagueEntry.wins}:승")
