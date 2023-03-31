@@ -162,9 +162,6 @@ fun TopScrollContent(
     scrollState: ScrollState,
     summonerDTO: SummonerDTO
 ) {
-    Log.e("image",
-        LocalContext.current.getString(R.string.PROFILE_ICON_BASE_URL)+"${summonerDTO.profileIconId}.png"
-    )
     val dynamicHeight = (250f - scrollState.value).coerceIn(130f, 250f)
     val scope = rememberCoroutineScope()
     val modifier = Modifier
@@ -322,6 +319,18 @@ fun RankView(
                     }
                     leagueEntry.isEmpty() -> {
                         items(dummy) {
+                            RankItem(
+                                leagueEntry = it,
+                                modifier
+                                    .heightIn(
+                                        max = animateDpAsState(targetValue = dynamicHeight.dp).value
+                                    )
+                                    .fillMaxSize()
+                            )
+                        }
+                    }
+                    leagueEntry.size == 2 -> {
+                        items(leagueEntry) {
                             RankItem(
                                 leagueEntry = it,
                                 modifier
