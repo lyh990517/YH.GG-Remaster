@@ -12,6 +12,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -19,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
@@ -29,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
 import yunho.compose.domain.model.LeagueEntryDTO
 import yunho.compose.domain.model.MatchDTO
 import yunho.compose.domain.model.SummonerDTO
@@ -122,12 +126,26 @@ fun DetailScreen(
 }
 
 @Composable
+private fun MatchView(
+    modifier: Modifier = Modifier,
+    itemList: MutableList<MatchState.Success>,
+    scrollState: ScrollState
+) {
+    Column(modifier = modifier.verticalScroll(scrollState)) {
+        itemList.forEach {
+            MatchItem(it.matchData)
+        }
+    }
+}
+
+@Composable
 fun TopScrollContent(
     navigator: NavController,
     scrollState: ScrollState,
     summonerDTO: SummonerDTO
 ) {
     val dynamicHeight = (250f - scrollState.value).coerceIn(130f, 250f)
+    val scope = rememberCoroutineScope()
     val modifier = Modifier
         .heightIn(min = animateDpAsState(targetValue = dynamicHeight.dp).value)
         .fillMaxWidth()
@@ -189,7 +207,53 @@ fun TopScrollContent(
                     .clickable {
                         navigator.popBackStack()
                     })
+            Icon(
+                imageVector = Icons.Default.Star,
+                contentDescription = "",
+                tint = Color.Yellow,
+                modifier = Modifier
+                    .padding(15.dp)
+                    .align(Alignment.TopEnd)
+                    .clickable {
+                        //즐겨찾기
+                    })
         }
+        if (dynamicHeight.dp != 130.dp) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "",
+                tint = Color.White,
+                modifier = Modifier
+                    .padding(15.dp)
+                    .clickable {
+                        navigator.popBackStack()
+                    })
+            Icon(
+                imageVector = Icons.Default.Star,
+                contentDescription = "",
+                tint = Color.Yellow,
+                modifier = Modifier
+                    .padding(15.dp)
+                    .align(Alignment.TopEnd)
+                    .clickable {
+                        //즐겨찾기
+                    })
+        }
+        if (dynamicHeight.dp == 130.dp) {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowUp,
+                contentDescription = "",
+                tint = Color.White,
+                modifier = Modifier
+                    .padding(15.dp)
+                    .align(Alignment.BottomEnd)
+                    .clickable {
+                        scope.launch {
+                            scrollState.scrollTo(0)
+                        }
+                    })
+        }
+
     }
 }
 
@@ -230,18 +294,21 @@ fun SummonerView(
 
 @Composable
 fun RankItem(leagueEntry: LeagueEntryDTO) {
+    val screenWidth = with(LocalContext.current.resources.displayMetrics) {
+        (LocalConfiguration.current.screenWidthDp)
+    }
     Column(
         Modifier
             .padding(3.dp)
             .clip(RoundedCornerShape(20.dp))
             .border(width = 1.dp, color = Color.Cyan, shape = RoundedCornerShape(20.dp))
-            .fillMaxWidth()
+            .width(screenWidth.dp - 8.dp)
             .background(Color.White)
     ) {
         Row(
             Modifier
                 .padding(horizontal = 5.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
         ) {
             Column(Modifier.padding(vertical = 5.dp, horizontal = 10.dp)) {
                 Image(
@@ -271,19 +338,6 @@ fun RankItem(leagueEntry: LeagueEntryDTO) {
 @Composable
 fun RankItemPreview() {
     RankItem(leagueEntry = dummy[0])
-}
-
-@Composable
-private fun MatchView(
-    modifier: Modifier = Modifier,
-    itemList: MutableList<MatchState.Success>,
-    scrollState: ScrollState
-) {
-    Column(modifier = modifier.verticalScroll(scrollState)) {
-        itemList.forEach {
-            MatchItem(it.matchData)
-        }
-    }
 }
 
 @Composable
