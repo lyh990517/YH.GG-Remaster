@@ -168,6 +168,7 @@ fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
     val item5 = item + "${myData.item5}.png"
     val item6 = item + "${myData.item6}.png"
     val champ = LocalContext.current.getString(R.string.CHAMPION_SQUARE_IMAGE_BASE_URL)
+    val spell = LocalContext.current.getString(R.string.SUMMONER_SPELL_IMAGE_BASE_URL)
 
     Column(
         Modifier
@@ -215,6 +216,8 @@ fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
                         model = champ + "${myData.championName}.png",
                         contentDescription = "champ"
                     )
+                    AsyncImage(model = spell + "${SPELLS[myData.summoner1Id]}.png", contentDescription = "spell")
+                    AsyncImage(model = spell + "${SPELLS[myData.summoner2Id]}.png", contentDescription = "spell")
                 }
                 Row(
                     Modifier
@@ -651,4 +654,22 @@ val dummySummonerDTO = SummonerDTO(
     id = "dummySummonerId",
     puuid = "dummyPuuid",
     summonerLevel = 100
+)
+val SPELLS = hashMapOf(
+    21 to "SummonerBarrier",
+    1 to "SummonerBoost",
+    14 to "SummonerDot",
+    3 to "SummonerExhaust",
+    4 to "SummonerFlash",
+    6 to "SummonerHaste",
+    7 to "SummonerHeal",
+    13 to "SummonerMana",
+    30 to "SummonerPoroRecall",
+    31 to "SummonerPoroThrow",
+    11 to "SummonerSmite",
+    39 to "SummonerSnowURFSnowball_Mark",
+    32 to "SummonerSnowball",
+    12 to "SummonerTeleport",
+    54 to "Summoner_UltBookPlaceholder",
+    55 to "Summoner_UltBookSmitePlaceholder"
 )

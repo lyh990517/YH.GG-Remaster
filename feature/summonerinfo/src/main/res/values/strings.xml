@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">summonerInfo</string>
-    <string name="PROFILE_ICON_BASE_URL">https://ddragon.leagueoflegends.com/cdn/12.6.1/img/profileicon/</string>
-    <string name="CHAMPION_SQUARE_IMAGE_BASE_URL">https://ddragon.leagueoflegends.com/cdn/12.6.1/img/champion/</string>
-    <string name="ITEM_IMAGE_BASE_URL">https://ddragon.leagueoflegends.com/cdn/12.6.1/img/item/</string>
+    <string name="PROFILE_ICON_BASE_URL">https://ddragon.leagueoflegends.com/cdn/13.7.1/img/profileicon/</string>
+    <string name="CHAMPION_SQUARE_IMAGE_BASE_URL">https://ddragon.leagueoflegends.com/cdn/13.7.1/img/champion/</string>
+    <string name="ITEM_IMAGE_BASE_URL">https://ddragon.leagueoflegends.com/cdn/13.7.1/img/item/</string>
     <string name="CHAMPION_IMAGE_BASE_URL">https://ddragon.leagueoflegends.com/cdn/img/champion/splash/</string>
-    <string name="SUMMONER_SPELL_IMAGE_BASE_URL">https://ddragon.leagueoflegends.com/cdn/12.6.1/img/spell/</string>
+    <string name="SUMMONER_SPELL_IMAGE_BASE_URL">https://ddragon.leagueoflegends.com/cdn/13.7.1/img/spell/</string>
 </resources>
