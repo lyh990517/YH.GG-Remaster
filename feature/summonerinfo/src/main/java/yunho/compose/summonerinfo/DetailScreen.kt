@@ -167,6 +167,7 @@ fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
     val item4 = item + "${myData.item4}.png"
     val item5 = item + "${myData.item5}.png"
     val item6 = item + "${myData.item6}.png"
+    val champ = LocalContext.current.getString(R.string.CHAMPION_SQUARE_IMAGE_BASE_URL)
 
     Column(
         Modifier
@@ -209,6 +210,15 @@ fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
                 Row(
                     Modifier
                         .padding(5.dp)
+                        .wrapContentSize()) {
+                    AsyncImage(
+                        model = champ + "${myData.championName}.png",
+                        contentDescription = "champ"
+                    )
+                }
+                Row(
+                    Modifier
+                        .padding(5.dp)
                         .wrapContentSize(),
                     horizontalArrangement = Arrangement.Center
                 ) {
@@ -216,37 +226,37 @@ fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
                         .padding(2.dp)
                         .width(30.dp)
                         .height(30.dp)
-                    if (item0 != "") AsyncImage(
+                    AsyncImage(
                         modifier = modi,
                         model = item0,
                         contentDescription = "item 0"
                     )
-                    if (item1 != "") AsyncImage(
+                    AsyncImage(
                         modifier = modi,
                         model = item1,
                         contentDescription = "item 1"
                     )
-                    if (item2 != "") AsyncImage(
+                    AsyncImage(
                         modifier = modi,
                         model = item2,
                         contentDescription = "item 2"
                     )
-                    if (item3 != "") AsyncImage(
+                    AsyncImage(
                         modifier = modi,
                         model = item3,
                         contentDescription = "item 3"
                     )
-                    if (item4 != "") AsyncImage(
+                    AsyncImage(
                         modifier = modi,
                         model = item4,
                         contentDescription = "item 4"
                     )
-                    if (item5 != "") AsyncImage(
+                    AsyncImage(
                         modifier = modi,
                         model = item5,
                         contentDescription = "item 5"
                     )
-                    if (item6 != "") AsyncImage(
+                    AsyncImage(
                         modifier = modi,
                         model = item6,
                         contentDescription = "item 6"

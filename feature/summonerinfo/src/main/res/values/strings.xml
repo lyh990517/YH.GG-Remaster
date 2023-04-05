@@ -4,4 +4,5 @@
     <string name="CHAMPION_SQUARE_IMAGE_BASE_URL">https://ddragon.leagueoflegends.com/cdn/12.6.1/img/champion/</string>
     <string name="ITEM_IMAGE_BASE_URL">https://ddragon.leagueoflegends.com/cdn/12.6.1/img/item/</string>
     <string name="CHAMPION_IMAGE_BASE_URL">https://ddragon.leagueoflegends.com/cdn/img/champion/splash/</string>
+    <string name="SUMMONER_SPELL_IMAGE_BASE_URL">https://ddragon.leagueoflegends.com/cdn/12.6.1/img/spell/</string>
 </resources>
