@@ -70,7 +70,7 @@ internal class MatchViewModelTest {
         coEvery { getOneMatchInfoUseCase.getInfo(matchId) } returns flow { emit(matchDTO) }
 
         assertEquals(MatchState.Loading, viewmodel.matchState.value)
-        val job = viewmodel.getMatchInfo(matchId)
+        val job = viewmodel.getMatchInfo(listOf(matchId))
         delay(100)
         job.cancel()
         assertEquals(MatchState.Success(matchDTO), viewmodel.matchState.value)

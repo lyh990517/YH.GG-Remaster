@@ -27,11 +27,13 @@ class MatchViewModel @Inject constructor(
         }
     }
 
-    suspend fun getMatchInfo(matchId: String) = viewModelScope.launch {
-        getOneMatchInfoUseCase.getInfo(matchId).catch {
-            _matchState.value = MatchState.Error(it)
-        }.collect {
-            _matchState.value = MatchState.Success(it)
+    suspend fun getMatchInfo(matchId: List<String>) = viewModelScope.launch {
+        matchId.forEach { id ->
+            getOneMatchInfoUseCase.getInfo(id).catch {
+                _matchState.value = MatchState.Error(it)
+            }.collect {
+                _matchState.value = MatchState.Success(it)
+            }
         }
     }
 }
