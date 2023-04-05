@@ -190,7 +190,7 @@ fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
             Column(
                 Modifier
                     .fillMaxHeight()
-                    .width(40.dp)
+                    .width(60.dp)
                     .background(Color(color)),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -203,6 +203,11 @@ fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
                         .fillMaxWidth()
                         .background(Color.White)
                 )
+                Text(
+                    text = "${QUEUE[matchData.info.queueId]}",
+                    color = Color.White,
+                    fontSize = 8.sp
+                )
             }
             Column(
                 Modifier
@@ -211,13 +216,41 @@ fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
                 Row(
                     Modifier
                         .padding(5.dp)
-                        .wrapContentSize()) {
+                        .wrapContentSize(), verticalAlignment = Alignment.Bottom
+                ) {
                     AsyncImage(
                         model = champ + "${myData.championName}.png",
                         contentDescription = "champ"
                     )
-                    AsyncImage(model = spell + "${SPELLS[myData.summoner1Id]}.png", contentDescription = "spell")
-                    AsyncImage(model = spell + "${SPELLS[myData.summoner2Id]}.png", contentDescription = "spell")
+                    Spacer(modifier = Modifier.padding(horizontal = 3.dp))
+                    AsyncImage(
+                        model = spell + "${SPELLS[myData.summoner1Id]}.png",
+                        contentDescription = "spell"
+                    )
+                    AsyncImage(
+                        model = spell + "${SPELLS[myData.summoner2Id]}.png",
+                        contentDescription = "spell"
+                    )
+
+                    val modifier = Modifier.padding(bottom = 10.dp)
+                    Text(
+                        text = "${myData.kills}/",
+                        fontFamily = font_t,
+                        fontSize = 20.sp,
+                        modifier = modifier.padding(start = 30.dp)
+                    )
+                    Text(
+                        text = "${myData.deaths}/",
+                        fontFamily = font_t,
+                        fontSize = 20.sp,
+                        modifier = modifier
+                    )
+                    Text(
+                        text = "${myData.assists}",
+                        fontFamily = font_t,
+                        fontSize = 20.sp,
+                        modifier = modifier
+                    )
                 }
                 Row(
                     Modifier
@@ -672,4 +705,24 @@ val SPELLS = hashMapOf(
     12 to "SummonerTeleport",
     54 to "Summoner_UltBookPlaceholder",
     55 to "Summoner_UltBookSmitePlaceholder"
+)
+val QUEUE = hashMapOf<Int, String>(
+    0 to "연습모드",
+    400 to "일반",
+    420 to "솔랭",
+    430 to "일반",
+    440 to "자랭",
+    450 to "무작위 총력전",
+    700 to "격전",
+    830 to "ai",
+    840 to "ai",
+    850 to "ai",
+    900 to "URF",
+    920 to "포로왕",
+    1020 to "포로왕",
+    1300 to "돌격 넥서스",
+    1400 to "궁극기 주문서",
+    2000 to "튜토리얼",
+    2010 to "튜토리얼",
+    2020 to "튜토리얼",
 )
