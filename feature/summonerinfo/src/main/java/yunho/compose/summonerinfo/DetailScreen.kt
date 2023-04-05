@@ -71,6 +71,9 @@ fun DetailScreen(
             val matchSize = remember {
                 mutableStateOf(0)
             }
+            val progress = rememberSaveable {
+                mutableStateOf(0f)
+            }
             val scrollState = rememberScrollState(0)
             when (summonerState) {
                 is SummonerState.Loading -> {
@@ -111,7 +114,7 @@ fun DetailScreen(
                     Log.e("MatchState", "Success")
                     val match = matchState as MatchState.Success
                     matchList.add(match)
-                    Log.e("size", "${matchList.size} ${matchSize.value}")
+                    progress.value = (matchList.size.toFloat() / matchSize.value)
                     if (matchList.size >= matchSize.value) {
                         TopScrollContent(
                             navigator = navigator,
@@ -130,14 +133,17 @@ fun DetailScreen(
                             summonerDTO = currentSummoner.value,
                             matchState = matchState
                         )
-                        matchSize.value = 0
+                        matchSize.value = 100
                     } else {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .background(Color.Yellow)
                         ) {
-                            CircularProgressIndicator(modifier = Modifier.align(alignment = Alignment.Center))
+                            CircularProgressIndicator(
+                                progress = progress.value,
+                                modifier = Modifier.align(alignment = Alignment.Center)
+                            )
                         }
                     }
                 }
