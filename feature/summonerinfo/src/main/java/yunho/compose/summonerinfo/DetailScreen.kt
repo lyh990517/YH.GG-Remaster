@@ -154,7 +154,6 @@ private fun MatchView(
 fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
     if (matchData.info.participants.none { it.summonerName == summonerDTO.name }) return
     val myData = matchData.info.participants.filter { it.summonerName == summonerDTO.name }[0]
-    val isExpand = rememberSaveable { mutableStateOf(false) }
     val color = LocalContext.current.getColor(if (myData.win) R.color.win else R.color.lose)
     val colorBack =
         LocalContext.current.getColor(if (myData.win) R.color.win_back else R.color.lose_back)
@@ -169,11 +168,27 @@ fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
     val item6 = item + "${myData.item6}.png"
     val champ = LocalContext.current.getString(R.string.CHAMPION_SQUARE_IMAGE_BASE_URL)
     val spell = LocalContext.current.getString(R.string.SUMMONER_SPELL_IMAGE_BASE_URL)
-
+    val doubleBadge = myData.doubleKills != 0
+    val tripleBadge = myData.tripleKills != 0
+    val quadraBadge = myData.quadraKills != 0
+    val pentaBadge = myData.pentaKills != 0
+    val badge = when {
+        pentaBadge -> "펜타킬"
+        quadraBadge -> "쿼드라킬"
+        tripleBadge -> "트리플킬"
+        doubleBadge -> "더블킬"
+        else -> ""
+    }
+    val playTime = (myData.timePlayed / 60).toString() + ":" +
+            if (myData.timePlayed % 60 < 10) {
+                "0" + (myData.timePlayed % 60).toString()
+            } else {
+                (myData.timePlayed % 60).toString()
+            }
     Column(
         Modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .height(110.dp)
             .background(color = Color(colorBack))
     ) {
         Spacer(
@@ -184,7 +199,7 @@ fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
         )
         Row(
             Modifier
-                .height(100.dp)
+                .fillMaxHeight()
                 .fillMaxWidth()
         ) {
             Column(
@@ -220,37 +235,53 @@ fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
                 ) {
                     AsyncImage(
                         model = champ + "${myData.championName}.png",
-                        contentDescription = "champ"
+                        contentDescription = "champ",
+                        modifier = Modifier.clip(shape = RoundedCornerShape(10.dp))
                     )
                     Spacer(modifier = Modifier.padding(horizontal = 3.dp))
                     AsyncImage(
                         model = spell + "${SPELLS[myData.summoner1Id]}.png",
-                        contentDescription = "spell"
+                        contentDescription = "spell",
+                        modifier = Modifier.clip(shape = RoundedCornerShape(5.dp))
                     )
                     AsyncImage(
                         model = spell + "${SPELLS[myData.summoner2Id]}.png",
-                        contentDescription = "spell"
+                        contentDescription = "spell",
+                        modifier = Modifier.clip(shape = RoundedCornerShape(5.dp))
                     )
 
                     val modifier = Modifier.padding(bottom = 10.dp)
-                    Text(
-                        text = "${myData.kills}/",
-                        fontFamily = font_t,
-                        fontSize = 20.sp,
-                        modifier = modifier.padding(start = 30.dp)
-                    )
-                    Text(
-                        text = "${myData.deaths}/",
-                        fontFamily = font_t,
-                        fontSize = 20.sp,
-                        modifier = modifier
-                    )
-                    Text(
-                        text = "${myData.assists}",
-                        fontFamily = font_t,
-                        fontSize = 20.sp,
-                        modifier = modifier
-                    )
+                    Column(modifier) {
+                        Row(Modifier) {
+                            Text(
+                                text = "${myData.kills}/",
+                                fontFamily = font_t,
+                                fontSize = 20.sp,
+                                modifier = Modifier.padding(start = 30.dp)
+                            )
+                            Text(
+                                text = "${myData.deaths}/",
+                                fontFamily = font_t,
+                                fontSize = 20.sp,
+                                modifier = Modifier
+                            )
+                            Text(
+                                text = "${myData.assists}",
+                                fontFamily = font_t,
+                                fontSize = 20.sp,
+                                modifier = Modifier
+                            )
+                        }
+                        if (doubleBadge) Badge(
+                            Modifier.padding(start = 40.dp),
+                            backgroundColor = Color(LocalContext.current.getColor(R.color.badge))
+                        ) {
+                            Text(
+                                text = badge,
+                                color = Color(LocalContext.current.getColor(R.color.badge_text))
+                            )
+                        }
+                    }
                 }
                 Row(
                     Modifier
@@ -260,42 +291,49 @@ fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
                 ) {
                     val modi = Modifier
                         .padding(2.dp)
+                        .clip(shape = RoundedCornerShape(10.dp))
                         .width(30.dp)
                         .height(30.dp)
-                    AsyncImage(
+                    if (myData.item0 != 0) AsyncImage(
                         modifier = modi,
                         model = item0,
                         contentDescription = "item 0"
-                    )
-                    AsyncImage(
+                    ) else Box(modifier = modi.background(Color.LightGray))
+                    if (myData.item1 != 0) AsyncImage(
                         modifier = modi,
                         model = item1,
                         contentDescription = "item 1"
-                    )
-                    AsyncImage(
+                    ) else Box(modifier = modi.background(Color.LightGray))
+                    if (myData.item2 != 0) AsyncImage(
                         modifier = modi,
                         model = item2,
                         contentDescription = "item 2"
-                    )
-                    AsyncImage(
+                    ) else Box(modifier = modi.background(Color.LightGray))
+                    if (myData.item3 != 0) AsyncImage(
                         modifier = modi,
                         model = item3,
                         contentDescription = "item 3"
-                    )
-                    AsyncImage(
+                    ) else Box(modifier = modi.background(Color.LightGray))
+                    if (myData.item4 != 0) AsyncImage(
                         modifier = modi,
                         model = item4,
                         contentDescription = "item 4"
-                    )
-                    AsyncImage(
+                    ) else Box(modifier = modi.background(Color.LightGray))
+                    if (myData.item5 != 0) AsyncImage(
                         modifier = modi,
                         model = item5,
                         contentDescription = "item 5"
-                    )
-                    AsyncImage(
+                    ) else Box(modifier = modi.background(Color.LightGray))
+                    if (myData.item6 != 0) AsyncImage(
                         modifier = modi,
                         model = item6,
                         contentDescription = "item 6"
+                    ) else Box(modifier = modi.background(Color.LightGray))
+                    Text(
+                        modifier = Modifier.padding(start = 20.dp),
+                        text = playTime,
+                        fontSize = 13.sp,
+                        fontFamily = font_t,
                     )
                 }
             }
