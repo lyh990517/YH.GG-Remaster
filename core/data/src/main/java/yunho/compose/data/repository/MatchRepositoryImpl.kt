@@ -10,7 +10,7 @@ import javax.inject.Inject
 class MatchRepositoryImpl @Inject constructor(private val matchDataSource: MatchDataSource) :
     MatchRepository {
     override suspend fun getMatchId(puuid: String): Flow<List<String>> = flow {
-        val response = matchDataSource.getMatchIdBypuuid(puuid, 1, 10)
+        val response = matchDataSource.getMatchIdBypuuid(puuid, 1, 20)
         response.body()?.let {
             emit(it)
         }

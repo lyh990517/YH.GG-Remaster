@@ -119,12 +119,16 @@ fun DetailScreen(
                 Modifier, leagueEntry = summonerLeague.value, scrollState = scrollState
             )
             MatchView(
-                Modifier.weight(1f), itemList = matchList, scrollState = scrollState
+                Modifier.weight(1f),
+                itemList = matchList,
+                scrollState = scrollState,
+                summonerDTO = currentSummoner.value
             )
         }
     }
     BackHandler {
         navigator.popBackStack()
+        matchList.clear()
     }
 }
 
@@ -132,12 +136,65 @@ fun DetailScreen(
 private fun MatchView(
     modifier: Modifier = Modifier,
     itemList: MutableList<MatchState.Success>,
-    scrollState: ScrollState
+    scrollState: ScrollState,
+    summonerDTO: SummonerDTO
 ) {
     Column(modifier = modifier.verticalScroll(scrollState)) {
         itemList.forEach {
-            MatchItem(it.matchData)
+            MatchItem(it.matchData, summonerDTO)
         }
+    }
+}
+
+@Composable
+fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
+    if (matchData.info.participants.none { it.summonerName == summonerDTO.name }) return
+    val myData = matchData.info.participants.filter { it.summonerName == summonerDTO.name }[0]
+    val isExpand = rememberSaveable { mutableStateOf(false) }
+    val color = LocalContext.current.getColor(if (myData.win) R.color.win else R.color.lose)
+    val colorBack =
+        LocalContext.current.getColor(if (myData.win) R.color.win_back else R.color.lose_back)
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .height(100.dp)
+            .background(color = Color(colorBack))
+    ) {
+        Spacer(
+            modifier = Modifier
+                .height(1.dp)
+                .fillMaxWidth()
+                .background(Color.White)
+        )
+        Row(
+            Modifier
+                .height(100.dp)
+                .fillMaxWidth()
+        ) {
+            Column(
+                Modifier
+                    .height(100.dp)
+                    .width(40.dp)
+                    .background(Color(color)),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = if (myData.win) "승리" else "패배", color = Color.White, fontSize = 12.sp)
+                Spacer(
+                    modifier = Modifier
+                        .padding(7.dp)
+                        .height(1.dp)
+                        .fillMaxWidth()
+                        .background(Color.White)
+                )
+            }
+        }
+        Spacer(
+            modifier = Modifier
+                .height(1.dp)
+                .fillMaxWidth()
+                .background(Color.White)
+        )
     }
 }
 
@@ -174,7 +231,7 @@ fun TopScrollContent(
                 .heightIn(max = animateDpAsState(targetValue = dynamicHeight.dp).value)
                 .fillMaxSize(),
             onError = {
-                Log.e("error","${it.result.throwable.message}")
+                Log.e("error", "${it.result.throwable.message}")
             }
         )
         Column(
@@ -346,6 +403,7 @@ fun RankView(
 val font = FontFamily(
     Font(R.font.font)
 )
+
 val font_t = FontFamily(
     Font(R.font.font_thick)
 )
@@ -442,11 +500,6 @@ fun RankView(modifier: Modifier = Modifier) {
 
 }
 
-@Composable
-fun MatchItem(matchData: MatchDTO) {
-    Text(text = "${matchData.info.participants}")
-}
-
 @Preview
 @Composable
 fun MatchItemPreview() {
@@ -472,7 +525,11 @@ fun SummonerViewPreview() {
 @Preview
 @Composable
 fun MatchViewPreview() {
-    MatchView(itemList = mutableListOf(), scrollState = ScrollState(0))
+    MatchView(
+        itemList = mutableListOf(),
+        scrollState = ScrollState(0),
+        summonerDTO = dummySummonerDTO
+    )
 }
 
 val dummy = listOf(

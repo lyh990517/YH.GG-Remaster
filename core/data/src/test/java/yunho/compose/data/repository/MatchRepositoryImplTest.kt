@@ -35,7 +35,7 @@ internal class MatchRepositoryImplTest {
         val puuid = "123"
         val idListOfMatch = listOf("matchId1", "matchId1", "matchId3")
 
-        coEvery { matchDataSource.getMatchIdBypuuid(puuid, 1, 10) } returns Response.success(
+        coEvery { matchDataSource.getMatchIdBypuuid(puuid, 1, 20) } returns Response.success(
             idListOfMatch
         )
         val result = matchRepositoryImpl.getMatchId(puuid).toList().first()

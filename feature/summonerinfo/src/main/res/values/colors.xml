@@ -11,4 +11,8 @@
     <color name="badge">#B0DEF1</color>
     <color name="badge_text">#0783B8</color>
     <color name="spacer">#E9F1F5</color>
+    <color name="win_back">#DCF5F8</color>
+    <color name="lose_back">#F9E6E0</color>
+    <color name="win">#39B8F1</color>
+    <color name="lose">#F13E31</color>
 </resources>
