@@ -113,7 +113,8 @@ fun DetailScreen(
                 navigator = navigator,
                 scrollState = scrollState,
                 summonerDTO = currentSummoner.value,
-                matchList = matchList
+                matchList = matchList,
+                matchState = matchState
             )
             RankView(
                 Modifier, leagueEntry = summonerLeague.value, scrollState = scrollState
@@ -122,7 +123,8 @@ fun DetailScreen(
                 Modifier.weight(1f),
                 itemList = matchList,
                 scrollState = scrollState,
-                summonerDTO = currentSummoner.value
+                summonerDTO = currentSummoner.value,
+                matchState = matchState
             )
         }
     }
@@ -137,8 +139,10 @@ private fun MatchView(
     modifier: Modifier = Modifier,
     itemList: MutableList<MatchState.Success>,
     scrollState: ScrollState,
-    summonerDTO: SummonerDTO
+    summonerDTO: SummonerDTO,
+    matchState: MatchState
 ) {
+    if (matchState is MatchState.Loading) return
     Column(modifier = modifier.verticalScroll(scrollState)) {
         itemList.forEach {
             MatchItem(it.matchData, summonerDTO)
@@ -154,6 +158,16 @@ fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
     val color = LocalContext.current.getColor(if (myData.win) R.color.win else R.color.lose)
     val colorBack =
         LocalContext.current.getColor(if (myData.win) R.color.win_back else R.color.lose_back)
+    val item =
+        LocalContext.current.getString(R.string.ITEM_IMAGE_BASE_URL)
+    val item0 = item + "${myData.item0}.png"
+    val item1 = item + "${myData.item1}.png"
+    val item2 = item + "${myData.item2}.png"
+    val item3 = item + "${myData.item3}.png"
+    val item4 = item + "${myData.item4}.png"
+    val item5 = item + "${myData.item5}.png"
+    val item6 = item + "${myData.item6}.png"
+
     Column(
         Modifier
             .fillMaxWidth()
@@ -173,7 +187,7 @@ fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
         ) {
             Column(
                 Modifier
-                    .height(100.dp)
+                    .fillMaxHeight()
                     .width(40.dp)
                     .background(Color(color)),
                 verticalArrangement = Arrangement.Center,
@@ -187,6 +201,57 @@ fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
                         .fillMaxWidth()
                         .background(Color.White)
                 )
+            }
+            Column(
+                Modifier
+                    .fillMaxSize(), verticalArrangement = Arrangement.Bottom
+            ) {
+                Row(
+                    Modifier
+                        .padding(5.dp)
+                        .wrapContentSize(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    val modi = Modifier
+                        .padding(2.dp)
+                        .width(30.dp)
+                        .height(30.dp)
+                    if (item0 != "") AsyncImage(
+                        modifier = modi,
+                        model = item0,
+                        contentDescription = "item 0"
+                    )
+                    if (item1 != "") AsyncImage(
+                        modifier = modi,
+                        model = item1,
+                        contentDescription = "item 1"
+                    )
+                    if (item2 != "") AsyncImage(
+                        modifier = modi,
+                        model = item2,
+                        contentDescription = "item 2"
+                    )
+                    if (item3 != "") AsyncImage(
+                        modifier = modi,
+                        model = item3,
+                        contentDescription = "item 3"
+                    )
+                    if (item4 != "") AsyncImage(
+                        modifier = modi,
+                        model = item4,
+                        contentDescription = "item 4"
+                    )
+                    if (item5 != "") AsyncImage(
+                        modifier = modi,
+                        model = item5,
+                        contentDescription = "item 5"
+                    )
+                    if (item6 != "") AsyncImage(
+                        modifier = modi,
+                        model = item6,
+                        contentDescription = "item 6"
+                    )
+                }
             }
         }
         Spacer(
@@ -203,8 +268,10 @@ fun TopScrollContent(
     navigator: NavController,
     scrollState: ScrollState,
     summonerDTO: SummonerDTO,
-    matchList: List<MatchState.Success>
+    matchList: List<MatchState.Success>,
+    matchState: MatchState
 ) {
+    if (matchState is MatchState.Loading || matchList.isEmpty()) return
     val dynamicHeight = (250f - scrollState.value).coerceIn(130f, 250f)
     val scope = rememberCoroutineScope()
     val modifier = Modifier
@@ -219,7 +286,6 @@ fun TopScrollContent(
         mutableStateOf(data)
     }
     background.value = data
-    Log.e("back", background.value)
     BoxWithConstraints(
         modifier = modifier
     ) {
@@ -528,7 +594,8 @@ fun MatchViewPreview() {
     MatchView(
         itemList = mutableListOf(),
         scrollState = ScrollState(0),
-        summonerDTO = dummySummonerDTO
+        summonerDTO = dummySummonerDTO,
+        matchState = MatchState.Loading
     )
 }
 
