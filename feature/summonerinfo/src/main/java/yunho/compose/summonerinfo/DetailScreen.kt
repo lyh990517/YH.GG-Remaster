@@ -2,12 +2,9 @@ package yunho.compose.summonerinfo
 
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.activity.compose.BackHandler
-import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,30 +14,22 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import coil.compose.rememberImagePainter
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import yunho.compose.domain.model.LeagueEntryDTO
 import yunho.compose.domain.model.MatchDTO
@@ -74,6 +63,7 @@ fun DetailScreen(
         mutableStateOf(0)
     }
     val scrollState = rememberScrollState(0)
+    val scope = rememberCoroutineScope()
     when (summonerState) {
         is SummonerState.Loading -> {
             Log.e("SummonerState", "Loading")
@@ -90,7 +80,11 @@ fun DetailScreen(
         is SummonerState.LoadLeagueEntry -> {
             Log.e("SummonerState", "LoadLeagueEntry")
             val leagueEntryDTO = summonerState as SummonerState.LoadLeagueEntry
-            summonerLeague.value = leagueEntryDTO.data.ifEmpty { listOf() }
+            LaunchedEffect(Unit) {
+                leagueEntryDTO.data.collect {
+                    summonerLeague.value = it
+                }
+            }
         }
         is SummonerState.Error -> {
 
@@ -129,13 +123,14 @@ fun DetailScreen(
             if (matchList.size >= matchSize.value) {
                 TopScrollContent(
                     navigator = navigator,
-                    scrollState = scrollState,
+                    scrollState = scrollState.value,
                     summonerDTO = currentSummoner.value,
                     matchList = matchList,
-                    matchState = matchState
+                    matchState = matchState,
+                    onClickButton = { scope.launch { scrollState.scrollTo(0) } }
                 )
                 RankView(
-                    Modifier, leagueEntry = summonerLeague.value, scrollState = scrollState
+                    Modifier, leagueEntry = summonerLeague.value, scrollState = scrollState.value
                 )
                 MatchView(
                     Modifier.weight(1f),
@@ -380,15 +375,15 @@ fun logging(text: String) {
 @Composable
 fun TopScrollContent(
     navigator: NavController,
-    scrollState: ScrollState,
+    scrollState: Int,
     summonerDTO: SummonerDTO,
     matchList: SnapshotStateList<MatchDTO>,
-    matchState: MatchState
+    matchState: MatchState,
+    onClickButton: () -> Unit
 ) {
     if (matchState is MatchState.Loading || matchList.isEmpty()) return
     logging("TopScrollContent")
-    val dynamicHeight = (250f - scrollState.value).coerceIn(130f, 250f)
-    val scope = rememberCoroutineScope()
+    val dynamicHeight = (250f - scrollState).coerceIn(130f, 250f)
     val modifier = Modifier
         .heightIn(min = animateDpAsState(targetValue = dynamicHeight.dp).value)
         .fillMaxWidth()
@@ -480,9 +475,7 @@ fun TopScrollContent(
                     .padding(15.dp)
                     .align(Alignment.BottomEnd)
                     .clickable {
-                        scope.launch {
-                            scrollState.scrollTo(0)
-                        }
+                        onClickButton()
                     })
         }
 
@@ -491,10 +484,10 @@ fun TopScrollContent(
 
 @Composable
 fun RankView(
-    modifier: Modifier, leagueEntry: List<LeagueEntryDTO>, scrollState: ScrollState
+    modifier: Modifier, leagueEntry: List<LeagueEntryDTO>, scrollState: Int
 ) {
     logging("RankView")
-    val dynamicHeight = (120f - scrollState.value).coerceIn(0f, 120f)
+    val dynamicHeight = (120f - scrollState).coerceIn(0f, 120f)
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -701,7 +694,7 @@ fun TopImageViewPreview() {
 @Preview(heightDp = 300)
 @Composable
 fun SummonerViewPreview() {
-    RankView(leagueEntry = dummy, modifier = Modifier, scrollState = ScrollState(0))
+    RankView(leagueEntry = dummy, modifier = Modifier, scrollState = ScrollState(0).value)
 }
 
 @Preview

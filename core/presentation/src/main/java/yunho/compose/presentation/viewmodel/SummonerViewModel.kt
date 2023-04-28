@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import yunho.compose.domain.usecase.GetOneSummonerInfoUseCase
 import yunho.compose.domain.usecase.GetOneSummonerLeagueEntryUseCase
@@ -29,10 +30,13 @@ class SummonerViewModel @Inject constructor(
     }
 
     fun getSummonerLeague(id: String) = viewModelScope.launch {
-        getOneSummonerLeagueEntryUseCase.getLeagueEntry(id).catch {
-            _summonerState.value = SummonerState.Error(it)
-        }.collect {
-            _summonerState.value = SummonerState.LoadLeagueEntry(it)
+        val flow = flow {
+            getOneSummonerLeagueEntryUseCase.getLeagueEntry(id).catch {
+                _summonerState.value = SummonerState.Error(it)
+            }.collect {
+                emit(it)
+            }
         }
+        _summonerState.value = SummonerState.LoadLeagueEntry(flow)
     }
 }
