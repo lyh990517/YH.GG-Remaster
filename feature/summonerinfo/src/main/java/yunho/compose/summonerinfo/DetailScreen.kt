@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,12 +58,16 @@ fun DetailScreen(
     summonerViewModel: SummonerViewModel,
     matchViewModel: MatchViewModel
 ) {
+    logging("DetailScreen")
     LaunchedEffect(Unit) {
         summonerViewModel.getSummonerInfo(summoner)
+
     }
     val summonerState by summonerViewModel.summonerState.collectAsState()
     val matchState by matchViewModel.matchState.collectAsState()
-    val matchList = rememberSaveable { mutableListOf<MatchState.Success>() }
+    val matchList = remember {
+        mutableStateListOf<MatchDTO>()
+    }
     val summonerLeague = remember { mutableStateOf(dummy) }
     val currentSummoner = remember { mutableStateOf(dummySummonerDTO) }
     val matchSize = remember {
@@ -107,7 +112,11 @@ fun DetailScreen(
         is MatchState.Success -> {
             Log.e("MatchState", "Success")
             val match = matchState as MatchState.Success
-            matchList.add(match)
+            LaunchedEffect(Unit) {
+                match.matchData.collect {
+                    matchList.add(it)
+                }
+            }
             Log.e("size", "${matchList.size} ${matchSize.value}")
         }
         is MatchState.Error -> {
@@ -147,30 +156,28 @@ fun DetailScreen(
             }
         }
     }
-    BackHandler {
-        navigator.popBackStack()
-        matchList.clear()
-    }
 }
 
 @Composable
 private fun MatchView(
     modifier: Modifier = Modifier,
-    itemList: MutableList<MatchState.Success>,
+    itemList: SnapshotStateList<MatchDTO>,
     scrollState: ScrollState,
     summonerDTO: SummonerDTO,
     matchState: MatchState
 ) {
+    logging("MatchView")
     if (matchState is MatchState.Loading) return
     Column(modifier = modifier.verticalScroll(scrollState)) {
         itemList.forEach {
-            MatchItem(it.matchData, summonerDTO)
+            MatchItem(it, summonerDTO)
         }
     }
 }
 
 @Composable
 fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
+    logging("MatchItem")
     if (matchData.info.participants.none { it.summonerName == summonerDTO.name }) return
     val myData = matchData.info.participants.filter { it.summonerName == summonerDTO.name }[0]
     val color = LocalContext.current.getColor(if (myData.win) R.color.win else R.color.lose)
@@ -366,15 +373,20 @@ fun MatchItem(matchData: MatchDTO, summonerDTO: SummonerDTO) {
     }
 }
 
+fun logging(text: String) {
+    Log.e("recompose", text)
+}
+
 @Composable
 fun TopScrollContent(
     navigator: NavController,
     scrollState: ScrollState,
     summonerDTO: SummonerDTO,
-    matchList: List<MatchState.Success>,
+    matchList: SnapshotStateList<MatchDTO>,
     matchState: MatchState
 ) {
     if (matchState is MatchState.Loading || matchList.isEmpty()) return
+    logging("TopScrollContent")
     val dynamicHeight = (250f - scrollState.value).coerceIn(130f, 250f)
     val scope = rememberCoroutineScope()
     val modifier = Modifier
@@ -384,7 +396,7 @@ fun TopScrollContent(
         LocalContext.current.getString(R.string.PROFILE_ICON_BASE_URL) + "${summonerDTO.profileIconId}.png"
     val data =
         if (matchList.isNotEmpty()) LocalContext.current.getString(R.string.CHAMPION_IMAGE_BASE_URL) +
-                "${matchList[0].matchData.info.participants[0].championName}_0.jpg" else ""
+                "${matchList[0].info.participants[0].championName}_0.jpg" else ""
     val background = remember {
         mutableStateOf(data)
     }
@@ -481,6 +493,7 @@ fun TopScrollContent(
 fun RankView(
     modifier: Modifier, leagueEntry: List<LeagueEntryDTO>, scrollState: ScrollState
 ) {
+    logging("RankView")
     val dynamicHeight = (120f - scrollState.value).coerceIn(0f, 120f)
     Box(
         modifier = modifier
@@ -694,8 +707,11 @@ fun SummonerViewPreview() {
 @Preview
 @Composable
 fun MatchViewPreview() {
+    val list = remember {
+        mutableStateListOf<MatchDTO>()
+    }
     MatchView(
-        itemList = mutableListOf(),
+        itemList = list,
         scrollState = ScrollState(0),
         summonerDTO = dummySummonerDTO,
         matchState = MatchState.Loading

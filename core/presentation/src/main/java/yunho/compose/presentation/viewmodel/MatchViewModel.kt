@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import yunho.compose.domain.usecase.GetMatchIdsUseCase
 import yunho.compose.domain.usecase.GetOneMatchInfoUseCase
@@ -26,13 +27,17 @@ class MatchViewModel @Inject constructor(
             _matchState.value = MatchState.LoadIds(it)
         }
     }
+
     fun getMatchInfo(matchId: List<String>) = viewModelScope.launch {
-        matchId.forEach { id ->
-            getOneMatchInfoUseCase.getInfo(id).catch {
-                _matchState.value = MatchState.Error(it)
-            }.collect {
-                _matchState.value = MatchState.Success(it)
+        val flow = flow {
+            matchId.forEach { id ->
+                getOneMatchInfoUseCase.getInfo(id).catch {
+                    _matchState.value = MatchState.Error(it)
+                }.collect {
+                    emit(it)
+                }
             }
         }
+        _matchState.value = MatchState.Success(flow)
     }
 }
