@@ -19,15 +19,14 @@ class MatchViewModel @Inject constructor(
     private val _matchState = MutableStateFlow<MatchState>(MatchState.Loading)
     val matchState = _matchState
 
-    suspend fun getMatchIds(puuid: String) = viewModelScope.launch {
+    fun getMatchIds(puuid: String) = viewModelScope.launch {
         getMatchIdsUseCase.getMatchIds(puuid).catch {
             _matchState.value = MatchState.Error(it)
         }.collect {
             _matchState.value = MatchState.LoadIds(it)
         }
     }
-
-    suspend fun getMatchInfo(matchId: List<String>) = viewModelScope.launch {
+    fun getMatchInfo(matchId: List<String>) = viewModelScope.launch {
         matchId.forEach { id ->
             getOneMatchInfoUseCase.getInfo(id).catch {
                 _matchState.value = MatchState.Error(it)

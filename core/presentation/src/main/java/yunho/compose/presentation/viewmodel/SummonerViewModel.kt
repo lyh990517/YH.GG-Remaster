@@ -20,7 +20,7 @@ class SummonerViewModel @Inject constructor(
 ) : ViewModel() {
     private val _summonerState = MutableStateFlow<SummonerState>(SummonerState.Loading)
     val summonerState = _summonerState
-    suspend fun getSummonerInfo(summonerName: String) = viewModelScope.launch {
+    fun getSummonerInfo(summonerName: String) = viewModelScope.launch {
         getOneSummonerInfoUseCase.getInfo(summonerName).catch {
             _summonerState.value = SummonerState.Error(it)
         }.collect {
@@ -28,7 +28,7 @@ class SummonerViewModel @Inject constructor(
         }
     }
 
-    suspend fun getSummonerLeague(id: String) = viewModelScope.launch {
+    fun getSummonerLeague(id: String) = viewModelScope.launch {
         getOneSummonerLeagueEntryUseCase.getLeagueEntry(id).catch {
             _summonerState.value = SummonerState.Error(it)
         }.collect {
