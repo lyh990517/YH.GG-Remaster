@@ -59,15 +59,14 @@ fun DetailScreen(
     val summonerLeague = remember { mutableStateOf(dummy) }
     val currentSummoner = remember { mutableStateOf(dummySummonerDTO) }
     val scrollState = rememberScrollState(0)
-    val progress = remember { mutableStateOf(0) }
     val scope = rememberCoroutineScope()
-    handleSummonerState(
+    HandleSummonerState(
         currentSummoner,
         matchViewModel,
         summonerViewModel,
         summonerLeague
     )
-    handelMatchState(
+    HandleMatchState(
         matchViewModel,
         matchList
     )
@@ -134,7 +133,7 @@ private fun DetailContent(
 }
 
 @Composable
-private fun handelMatchState(
+private fun HandleMatchState(
     matchViewModel: MatchViewModel,
     matchList: SnapshotStateList<MatchDTO>,
 ) {
@@ -171,7 +170,7 @@ private fun handelMatchState(
 }
 
 @Composable
-private fun handleSummonerState(
+private fun HandleSummonerState(
     currentSummoner: MutableState<SummonerDTO>,
     matchViewModel: MatchViewModel,
     summonerViewModel: SummonerViewModel,
