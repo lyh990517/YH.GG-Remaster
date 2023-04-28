@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import yunho.compose.domain.model.LeagueEntryDTO
 import yunho.compose.domain.model.MatchDTO
@@ -52,8 +53,6 @@ fun DetailScreen(
         summonerViewModel.getSummonerInfo(summoner)
 
     }
-    val summonerState by summonerViewModel.summonerState.collectAsState()
-    val matchState by matchViewModel.matchState.collectAsState()
     val matchList = remember {
         mutableStateListOf<MatchDTO>()
     }
@@ -64,32 +63,80 @@ fun DetailScreen(
     }
     val scrollState = rememberScrollState(0)
     val scope = rememberCoroutineScope()
-    when (summonerState) {
-        is SummonerState.Loading -> {
-            Log.e("SummonerState", "Loading")
-        }
-        is SummonerState.Success -> {
-            Log.e("SummonerState", "Success")
-            val summonerInfo = summonerState as SummonerState.Success
-            currentSummoner.value = summonerInfo.infoData
-            LaunchedEffect(Unit) {
-                matchViewModel.getMatchIds(summonerInfo.infoData.puuid)
-                summonerViewModel.getSummonerLeague(summonerInfo.infoData.id)
-            }
-        }
-        is SummonerState.LoadLeagueEntry -> {
-            Log.e("SummonerState", "LoadLeagueEntry")
-            val leagueEntryDTO = summonerState as SummonerState.LoadLeagueEntry
-            LaunchedEffect(Unit) {
-                leagueEntryDTO.data.collect {
-                    summonerLeague.value = it
+    handleSummonerState(
+        currentSummoner,
+        matchViewModel,
+        summonerViewModel,
+        summonerLeague
+    )
+    handelMatchState(
+        matchSize,
+        matchViewModel,
+        matchList
+    )
+    DetailContent(
+        matchList,
+        matchSize,
+        navigator,
+        scrollState,
+        currentSummoner,
+        scope,
+        summonerLeague
+    )
+}
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@Composable
+private fun DetailContent(
+    matchList: SnapshotStateList<MatchDTO>,
+    matchSize: MutableState<Int>,
+    navigator: NavController,
+    scrollState: ScrollState,
+    currentSummoner: MutableState<SummonerDTO>,
+    scope: CoroutineScope,
+    summonerLeague: MutableState<List<LeagueEntryDTO>>,
+) {
+    Scaffold {
+        Column {
+            if (matchList.size >= matchSize.value) {
+                TopScrollContent(
+                    navigator = navigator,
+                    scrollState = scrollState.value,
+                    summonerDTO = currentSummoner.value,
+                    matchList = matchList,
+                    onClickButton = { scope.launch { scrollState.scrollTo(0) } }
+                )
+                RankView(
+                    Modifier, leagueEntry = summonerLeague.value, scrollState = scrollState.value
+                )
+                MatchView(
+                    Modifier.weight(1f),
+                    itemList = matchList,
+                    scrollState = scrollState,
+                    summonerDTO = currentSummoner.value,
+                )
+                matchSize.value = 0
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Yellow)
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.align(alignment = Alignment.Center))
                 }
             }
         }
-        is SummonerState.Error -> {
-
-        }
     }
+}
+
+@Composable
+private fun handelMatchState(
+    matchSize: MutableState<Int>,
+    matchViewModel: MatchViewModel,
+    matchList: SnapshotStateList<MatchDTO>
+) {
+    logging("handelMatchState")
+    val matchState by matchViewModel.matchState.collectAsState()
     when (matchState) {
         is MatchState.Loading -> {
             Log.e("MatchState", "Loading")
@@ -118,37 +165,41 @@ fun DetailScreen(
             Log.e("MatchState", "${e.e.message}")
         }
     }
-    Scaffold {
-        Column {
-            if (matchList.size >= matchSize.value) {
-                TopScrollContent(
-                    navigator = navigator,
-                    scrollState = scrollState.value,
-                    summonerDTO = currentSummoner.value,
-                    matchList = matchList,
-                    matchState = matchState,
-                    onClickButton = { scope.launch { scrollState.scrollTo(0) } }
-                )
-                RankView(
-                    Modifier, leagueEntry = summonerLeague.value, scrollState = scrollState.value
-                )
-                MatchView(
-                    Modifier.weight(1f),
-                    itemList = matchList,
-                    scrollState = scrollState,
-                    summonerDTO = currentSummoner.value,
-                    matchState = matchState
-                )
-                matchSize.value = 0
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Yellow)
-                ) {
-                    CircularProgressIndicator(modifier = Modifier.align(alignment = Alignment.Center))
+}
+
+@Composable
+private fun handleSummonerState(
+    currentSummoner: MutableState<SummonerDTO>,
+    matchViewModel: MatchViewModel,
+    summonerViewModel: SummonerViewModel,
+    summonerLeague: MutableState<List<LeagueEntryDTO>>
+) {
+    val summonerState by summonerViewModel.summonerState.collectAsState()
+    logging("handleSummonerState")
+    when (summonerState) {
+        is SummonerState.Loading -> {
+            Log.e("SummonerState", "Loading")
+        }
+        is SummonerState.Success -> {
+            Log.e("SummonerState", "Success")
+            val summonerInfo = summonerState as SummonerState.Success
+            currentSummoner.value = summonerInfo.infoData
+            LaunchedEffect(Unit) {
+                matchViewModel.getMatchIds(summonerInfo.infoData.puuid)
+                summonerViewModel.getSummonerLeague(summonerInfo.infoData.id)
+            }
+        }
+        is SummonerState.LoadLeagueEntry -> {
+            Log.e("SummonerState", "LoadLeagueEntry")
+            val leagueEntryDTO = summonerState as SummonerState.LoadLeagueEntry
+            LaunchedEffect(Unit) {
+                leagueEntryDTO.data.collect {
+                    summonerLeague.value = it
                 }
             }
+        }
+        is SummonerState.Error -> {
+
         }
     }
 }
@@ -159,10 +210,8 @@ private fun MatchView(
     itemList: SnapshotStateList<MatchDTO>,
     scrollState: ScrollState,
     summonerDTO: SummonerDTO,
-    matchState: MatchState
 ) {
     logging("MatchView")
-    if (matchState is MatchState.Loading) return
     Column(modifier = modifier.verticalScroll(scrollState)) {
         itemList.forEach {
             MatchItem(it, summonerDTO)
@@ -378,10 +427,9 @@ fun TopScrollContent(
     scrollState: Int,
     summonerDTO: SummonerDTO,
     matchList: SnapshotStateList<MatchDTO>,
-    matchState: MatchState,
     onClickButton: () -> Unit
 ) {
-    if (matchState is MatchState.Loading || matchList.isEmpty()) return
+    if (matchList.isEmpty()) return
     logging("TopScrollContent")
     val dynamicHeight = (250f - scrollState).coerceIn(130f, 250f)
     val modifier = Modifier
@@ -707,7 +755,6 @@ fun MatchViewPreview() {
         itemList = list,
         scrollState = ScrollState(0),
         summonerDTO = dummySummonerDTO,
-        matchState = MatchState.Loading
     )
 }
 
