@@ -13,8 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import yunho.compose.screen.SearchScreen
-import yunho.compose.yhgg_remaster.presentaion.viewmodel.SummonerViewModel
+
 import yunho.compose.yhgg_remaster.ui.theme.YHGGRemasterTheme
 
 @AndroidEntryPoint

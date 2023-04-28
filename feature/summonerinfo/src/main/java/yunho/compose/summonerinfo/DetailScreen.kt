@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import kotlinx.coroutines.CoroutineScope
@@ -45,9 +46,9 @@ import yunho.compose.yhgg_remaster.presentaion.viewmodel.SummonerViewModel
 fun DetailScreen(
     summoner: String,
     navigator: NavController,
-    summonerViewModel: SummonerViewModel,
-    matchViewModel: MatchViewModel
 ) {
+    val summonerViewModel: SummonerViewModel = hiltViewModel()
+    val matchViewModel: MatchViewModel = hiltViewModel()
     logging("DetailScreen")
     LaunchedEffect(Unit) {
         summonerViewModel.getSummonerInfo(summoner)
