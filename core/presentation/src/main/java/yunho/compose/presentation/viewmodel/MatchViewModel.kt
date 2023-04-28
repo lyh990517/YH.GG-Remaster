@@ -1,5 +1,6 @@
 package yunho.compose.yhgg_remaster.presentaion.viewmodel
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,6 +20,8 @@ class MatchViewModel @Inject constructor(
 ) : ViewModel() {
     private val _matchState = MutableStateFlow<MatchState>(MatchState.Loading)
     val matchState = _matchState
+
+    val progress = mutableStateOf(5)
 
     fun getMatchIds(puuid: String) = viewModelScope.launch {
         getMatchIdsUseCase.getMatchIds(puuid).catch {

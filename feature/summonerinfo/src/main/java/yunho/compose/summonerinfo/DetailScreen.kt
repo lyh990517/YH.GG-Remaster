@@ -59,6 +59,7 @@ fun DetailScreen(
     val summonerLeague = remember { mutableStateOf(dummy) }
     val currentSummoner = remember { mutableStateOf(dummySummonerDTO) }
     val scrollState = rememberScrollState(0)
+    val progress = remember { mutableStateOf(0) }
     val scope = rememberCoroutineScope()
     handleSummonerState(
         currentSummoner,
@@ -76,7 +77,8 @@ fun DetailScreen(
         scrollState,
         currentSummoner,
         scope,
-        summonerLeague
+        summonerLeague,
+        matchViewModel
     )
 }
 
@@ -89,7 +91,9 @@ private fun DetailContent(
     currentSummoner: MutableState<SummonerDTO>,
     scope: CoroutineScope,
     summonerLeague: MutableState<List<LeagueEntryDTO>>,
+    viewModel: MatchViewModel
 ) {
+    val progress = viewModel.progress
     Scaffold {
         Column {
             if (matchList.size >= 20) {
@@ -115,7 +119,14 @@ private fun DetailContent(
                         .fillMaxSize()
                         .background(Color.Yellow)
                 ) {
-                    CircularProgressIndicator(modifier = Modifier.align(alignment = Alignment.Center))
+                    Column(
+                        Modifier
+                            .wrapContentSize()
+                            .align(alignment = Alignment.Center)
+                    ) {
+                        CircularProgressIndicator()
+                        Text(text = "${progress.value}%")
+                    }
                 }
             }
         }
@@ -125,7 +136,7 @@ private fun DetailContent(
 @Composable
 private fun handelMatchState(
     matchViewModel: MatchViewModel,
-    matchList: SnapshotStateList<MatchDTO>
+    matchList: SnapshotStateList<MatchDTO>,
 ) {
     logging("handelMatchState")
     val matchState by matchViewModel.matchState.collectAsState()
@@ -146,6 +157,8 @@ private fun handelMatchState(
             val match = matchState as MatchState.Success
             LaunchedEffect(Unit) {
                 match.matchData.collect {
+                    matchViewModel.progress.value += 5
+                    Log.e("progress", "${matchList.size}/20")
                     matchList.add(it)
                 }
             }
