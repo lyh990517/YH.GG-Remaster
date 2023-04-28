@@ -58,9 +58,6 @@ fun DetailScreen(
     }
     val summonerLeague = remember { mutableStateOf(dummy) }
     val currentSummoner = remember { mutableStateOf(dummySummonerDTO) }
-    val matchSize = remember {
-        mutableStateOf(0)
-    }
     val scrollState = rememberScrollState(0)
     val scope = rememberCoroutineScope()
     handleSummonerState(
@@ -70,13 +67,11 @@ fun DetailScreen(
         summonerLeague
     )
     handelMatchState(
-        matchSize,
         matchViewModel,
         matchList
     )
     DetailContent(
         matchList,
-        matchSize,
         navigator,
         scrollState,
         currentSummoner,
@@ -89,7 +84,6 @@ fun DetailScreen(
 @Composable
 private fun DetailContent(
     matchList: SnapshotStateList<MatchDTO>,
-    matchSize: MutableState<Int>,
     navigator: NavController,
     scrollState: ScrollState,
     currentSummoner: MutableState<SummonerDTO>,
@@ -98,7 +92,7 @@ private fun DetailContent(
 ) {
     Scaffold {
         Column {
-            if (matchList.size >= matchSize.value) {
+            if (matchList.size >= 20) {
                 TopScrollContent(
                     navigator = navigator,
                     scrollState = scrollState.value,
@@ -115,7 +109,6 @@ private fun DetailContent(
                     scrollState = scrollState,
                     summonerDTO = currentSummoner.value,
                 )
-                matchSize.value = 0
             } else {
                 Box(
                     modifier = Modifier
@@ -131,7 +124,6 @@ private fun DetailContent(
 
 @Composable
 private fun handelMatchState(
-    matchSize: MutableState<Int>,
     matchViewModel: MatchViewModel,
     matchList: SnapshotStateList<MatchDTO>
 ) {
@@ -144,7 +136,6 @@ private fun handelMatchState(
         is MatchState.LoadIds -> {
             Log.e("MatchState", "LoadIds")
             val ids = matchState as MatchState.LoadIds
-            matchSize.value = ids.ids.size
             LaunchedEffect(Unit) {
                 matchViewModel.getMatchInfo(ids.ids)
             }
@@ -158,7 +149,6 @@ private fun handelMatchState(
                     matchList.add(it)
                 }
             }
-            Log.e("size", "${matchList.size} ${matchSize.value}")
         }
         is MatchState.Error -> {
             val e = matchState as MatchState.Error
