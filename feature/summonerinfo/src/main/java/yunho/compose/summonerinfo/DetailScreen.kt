@@ -74,11 +74,13 @@ fun DetailScreen(
     DetailContent(
         matchList,
         navigator,
+        {scrollState.value},
         scrollState,
         currentSummoner,
         scope,
         summonerLeague,
-        matchViewModel
+        matchViewModel,
+        {scope.launch { scrollState.scrollTo(0) }}
     )
 }
 
@@ -87,11 +89,13 @@ fun DetailScreen(
 private fun DetailContent(
     matchList: SnapshotStateList<MatchDTO>,
     navigator: NavController,
+    scrollProvider: () -> Int,
     scrollState: ScrollState,
     currentSummoner: MutableState<SummonerDTO>,
     scope: CoroutineScope,
     summonerLeague: MutableState<List<LeagueEntryDTO>>,
-    viewModel: MatchViewModel
+    viewModel: MatchViewModel,
+    onClickButton: () -> Unit
 ) {
     val progress = viewModel.progress
     Scaffold {
@@ -99,13 +103,13 @@ private fun DetailContent(
             if (matchList.size >= 20) {
                 TopScrollContent(
                     navigator = navigator,
-                    scrollState = scrollState.value,
+                    dynamicHeight = { (250f - scrollState.value).coerceIn(130f, 250f).toInt() },
                     summonerDTO = currentSummoner.value,
                     matchList = matchList,
-                    onClickButton = { scope.launch { scrollState.scrollTo(0) } }
+                    onClickButton = onClickButton
                 )
                 RankView(
-                    Modifier, leagueEntry = summonerLeague.value, scrollState = scrollState.value
+                    Modifier, leagueEntry = summonerLeague.value, scrollProvider = scrollProvider
                 )
                 MatchView(
                     Modifier.weight(1f),
@@ -217,7 +221,9 @@ private fun MatchView(
     logging("MatchView")
     Column(modifier = modifier.verticalScroll(scrollState)) {
         itemList.forEach {
-            MatchItem(it, summonerDTO)
+            key(it.metadata.matchId) {
+                MatchItem(it, summonerDTO)
+            }
         }
     }
 }
@@ -427,35 +433,30 @@ fun logging(text: String) {
 @Composable
 fun TopScrollContent(
     navigator: NavController,
-    scrollState: Int,
+    dynamicHeight: () -> Int,
     summonerDTO: SummonerDTO,
     matchList: SnapshotStateList<MatchDTO>,
     onClickButton: () -> Unit
 ) {
     if (matchList.isEmpty()) return
     logging("TopScrollContent")
-    val dynamicHeight = (250f - scrollState).coerceIn(130f, 250f)
     val modifier = Modifier
-        .heightIn(min = animateDpAsState(targetValue = dynamicHeight.dp).value)
+        .heightIn(min = animateDpAsState(targetValue = dynamicHeight().dp).value)
         .fillMaxWidth()
     val profile =
         LocalContext.current.getString(R.string.PROFILE_ICON_BASE_URL) + "${summonerDTO.profileIconId}.png"
     val data =
         if (matchList.isNotEmpty()) LocalContext.current.getString(R.string.CHAMPION_IMAGE_BASE_URL) +
                 "${matchList[0].info.participants[0].championName}_0.jpg" else ""
-    val background = remember {
-        mutableStateOf(data)
-    }
-    background.value = data
     BoxWithConstraints(
         modifier = modifier
     ) {
         AsyncImage(
-            model = background.value,
+            model = data,
             contentDescription = "backGround",
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .heightIn(max = animateDpAsState(targetValue = dynamicHeight.dp).value)
+                .heightIn(max = animateDpAsState(targetValue = dynamicHeight().dp).value)
                 .fillMaxSize(),
             onError = {
                 Log.e("error", "${it.result.throwable.message}")
@@ -465,7 +466,7 @@ fun TopScrollContent(
             Modifier
                 .heightIn(
                     max = animateDpAsState(
-                        targetValue = dynamicHeight.dp
+                        targetValue = dynamicHeight().dp
                     ).value
                 )
                 .fillMaxSize(), verticalArrangement = Arrangement.Bottom
@@ -491,7 +492,7 @@ fun TopScrollContent(
                         color = Color.White
                     )
                 }
-                if (dynamicHeight.dp != 130.dp) Text(
+                if (dynamicHeight().dp != 130.dp) Text(
                     text = "${summonerDTO.summonerLevel}",
                     modifier = Modifier.padding(start = 50.dp, bottom = 5.dp),
                     color = Color.White,
@@ -499,7 +500,7 @@ fun TopScrollContent(
                 )
             }
         }
-        if (dynamicHeight.dp != 130.dp) {
+        if (dynamicHeight().dp != 130.dp) {
             Icon(imageVector = Icons.Default.ArrowBack,
                 contentDescription = "",
                 tint = Color.White,
@@ -518,7 +519,7 @@ fun TopScrollContent(
                         //즐겨찾기
                     })
         }
-        if (dynamicHeight.dp == 130.dp) {
+        if (dynamicHeight().dp == 130.dp) {
             Icon(imageVector = Icons.Default.KeyboardArrowUp,
                 contentDescription = "",
                 tint = Color.White,
@@ -535,10 +536,10 @@ fun TopScrollContent(
 
 @Composable
 fun RankView(
-    modifier: Modifier, leagueEntry: List<LeagueEntryDTO>, scrollState: Int
+    modifier: Modifier, leagueEntry: List<LeagueEntryDTO>, scrollProvider: () -> Int
 ) {
     logging("RankView")
-    val dynamicHeight = (120f - scrollState).coerceIn(0f, 120f)
+    val dynamicHeight = (120f - scrollProvider()).coerceIn(0f, 120f)
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -721,11 +722,6 @@ fun RankItemPreview() {
 fun TopImageView(modifier: Modifier = Modifier, summonerDTO: SummonerDTO) {
 }
 
-@Composable
-fun RankView(modifier: Modifier = Modifier) {
-
-}
-
 @Preview
 @Composable
 fun MatchItemPreview() {
@@ -745,7 +741,7 @@ fun TopImageViewPreview() {
 @Preview(heightDp = 300)
 @Composable
 fun SummonerViewPreview() {
-    RankView(leagueEntry = dummy, modifier = Modifier, scrollState = ScrollState(0).value)
+    RankView(leagueEntry = dummy, modifier = Modifier, scrollProvider = {0})
 }
 
 @Preview
